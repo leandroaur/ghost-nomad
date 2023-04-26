@@ -8,7 +8,7 @@ job "ghost" {
   }
 
   group "ghost" {
-    count = 2
+    count = 1
 
     restart {
       attempts = 10
