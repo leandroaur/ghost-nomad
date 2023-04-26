@@ -10,6 +10,12 @@ job "ghost" {
   group "ghost" {
     count = 1
 
+    volume "ghost" {
+      type      = "host"
+      read_only = false
+      source    = "ghost"
+    }
+
     restart {
       attempts = 10
       interval = "5m"
@@ -19,6 +25,12 @@ job "ghost" {
 
     task "ghost" {
       driver = "docker"
+
+      volume_mount {
+        volume      = "ghost"
+        destination = "/var/lib/ghost/content"
+        read_only   = false
+      }
 
       config {
         image = "ghost:5-alpine"
