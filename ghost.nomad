@@ -8,7 +8,24 @@ job "ghost" {
   }
 
   group "ghost" {
-    count = 1
+    task "wait-for-db" {
+      lifecycle {
+        hook = "prestart"
+        sidecar = false
+      }
+      driver = "docker"
+      config {
+        image = "alpine"
+        args = ["sh", "-c", "while ! nc -zv 100.73.246.57 3306; do sleep 1; done"]
+      }
+      resources {
+        cpu = 500
+        memory = 128
+      }
+    }
+
+ 
+    count = 2
 
     volume "ghost" {
       type      = "host"
