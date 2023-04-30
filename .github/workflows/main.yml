@@ -18,11 +18,11 @@ jobs:
           version: 1.14.0
 
       - name: Deploy nomad
-        uses: hashicorp/setup-nomad-pack@0.9.1
-        id: setup
-        with:
-          version: "0.0.1-techpreview2" # or `latest`
+        uses: rluisr/nomad-actions@master
           
-      - name: Run `nomad-pack info` for `nomad-ghost`
-        id: info
-        run: "nomad-pack info ./ghost-nomad/"
+      - name: Deploy
+        run: |
+          nomad job plan ghost.nomad
+          # or nomad-pack run .
+        env:
+          NOMAD_ADDR: "{{ secrets.NOMAD_ADDR }}"
