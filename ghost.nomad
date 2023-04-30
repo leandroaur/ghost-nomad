@@ -78,13 +78,13 @@ job "ghost" {
   "mail": {
     "transport": "SMTP",
     "options": {
-      "service": "uolhost",
-      "host": "smtp.leandroaurelio.net",
+      "service": "service_provider",
+      "host": "smtp.account.com",
       "port": 465,
       "secure": true,
       "auth": {
-        "user": "{{ secrets.MAIL_USER }}",
-        "pass": "{{ secrets.MAIL_PASS }}"
+        "user": "user@mail.com",
+        "pass": "password"
       }
     }    
   },
