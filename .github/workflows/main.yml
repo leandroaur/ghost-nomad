@@ -22,3 +22,7 @@ jobs:
         id: setup
         with:
           version: "0.0.1-techpreview2" # or `latest`
+          
+      - name: Run `nomad-pack info` for `nomad-ghost`
+        id: info
+        run: "nomad-pack info ./"
