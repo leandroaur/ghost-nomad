@@ -1,39 +1,31 @@
-name: CI-CD
-on:
-  push:
-    branches: [ main ]
+name: nomad-pack
 
-  workflow_dispatch:
+on:
+  - push
 
 jobs:
-
-  CD:
-    
+  setup-nomad-pack:
     runs-on: ubuntu-latest
-
+    name: Run Nomad Pack
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Connect Tailscale
-        uses: tailscale/github-action@v1
-        with:
-          authkey: ${{ secrets.TAILSCALE_KEY }} 
-          version: 1.14.0
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Setup `nomad-pack`
         # TODO: define `v1`
-        uses: hashicorp/setup-nomad-pack@v1
+        uses: hashicorp/setup-nomad-pack@v0.9.2
         id: setup
         with:
           version: "0.0.1-techpreview2" # or `latest`
 
-      - name: Run `nomad-pack info` for `ghost`
+      - name: Run `nomad-pack info` for `simple_service`
         id: info
-        run: "nomad-pack info ghost #./packs/simple_service"
+        run: "nomad-pack info ./packs/simple_service"
 
-      - name: Run `nomad-pack run` for ghost #`simple_service`
+      - name: Run `nomad-pack run` for `simple_service`
         id: run
-        run: "nomad-pack run ghost #./packs/simple_service"
+        run: "nomad-pack run ./packs/simple_service"
         env:
           NOMAD_ADDR: "${{ secrets.NOMAD_ADDR }}"
+          # NOMAD_TOKEN: "${{ secrets.NOMAD_TOKEN }}"
         continue-on-error: true
