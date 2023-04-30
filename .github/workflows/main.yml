@@ -22,7 +22,7 @@ jobs:
           
       - name: Deploy
         run: |
-          export NOMAD_ADDR={{ secrets.NOMAD_ADDR }}
+          export NOMAD_ADDR=http://100.73.246.57:4646
           nomad status
           nomad job run ghost.nomad
           # nomad job plan ghost.nomad
