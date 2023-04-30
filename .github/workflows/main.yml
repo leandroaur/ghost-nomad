@@ -16,3 +16,6 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_KEY }} 
           version: 1.14.0
+
+      - name: Deploy nomad
+        uses: hashicorp/setup-nomad-pack@0.9.1
