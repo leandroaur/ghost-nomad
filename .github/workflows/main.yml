@@ -22,7 +22,7 @@ jobs:
           
       - name: Deploy
         run: |
-          nomad-pack run .
+          nomad job run ghost.nomad
           # nomad job plan ghost.nomad
           # or nomad-pack run .
         env:
