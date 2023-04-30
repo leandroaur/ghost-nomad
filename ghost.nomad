@@ -83,8 +83,8 @@ job "ghost" {
       "port": 465,
       "secure": true,
       "auth": {
-        "user": "${{ secrets.MAIL_USER }}",
-        "pass": "${{ secrets.MAIL_PASS }}"
+        "user": "{{ secrets.MAIL_USER }}",
+        "pass": "{{ secrets.MAIL_PASS }}"
       }
     }    
   },
