@@ -1,12 +1,13 @@
 name: Deploy Nomad Job
-on: [push]
+on:
+  - push
 jobs:
   deploy:
     name: Nomad Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Connect Tailscale
         uses: tailscale/github-action@v1
@@ -19,5 +20,5 @@ jobs:
         with:
           # token: ${{ secrets.YOUR_NOMAD_SECRET }}
           address: ${{ secrets.NOMAD_ADDR }}
-          job: |-
+          job: ghost.nomad
           # config: path/to/your/levant/config/file
