@@ -22,7 +22,8 @@ jobs:
           
       - name: Deploy
         run: |
-          nomad job plan ghost.nomad
+          nomad-pack run .
+          # nomad job plan ghost.nomad
           # or nomad-pack run .
         env:
           NOMAD_ADDR: "{{ secrets.NOMAD_ADDR }}"
