@@ -16,7 +16,7 @@ job "ghost" {
       driver = "docker"
       config {
         image = "alpine"
-        args = ["sh", "-c", "while ! nc -zv 100.73.246.57 3306; do sleep 1; done"]
+        args = ["sh", "-c", "while ! nc -zv {{- range service "db" }}{{ .Address }}{{- end }} 3306; do sleep 1; done"]
       }
       resources {
         cpu = 500
