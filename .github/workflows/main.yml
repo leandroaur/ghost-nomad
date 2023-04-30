@@ -1,12 +1,14 @@
-name: Deploy Nomad Job
+name: nomad-pack
+
 on:
   - push
+
 jobs:
-  deploy:
-    name: Nomad Deploy
+  setup-nomad-pack:
     runs-on: ubuntu-latest
+    name: Run Nomad Pack
     steps:
-      - name: Checkout the code
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Connect Tailscale
@@ -14,11 +16,3 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_KEY }} 
           version: 1.14.0
-
-      - name: Deploy with Nomad
-        uses: qazz92/nomad-deploy
-        with:
-          # token: ${{ secrets.YOUR_NOMAD_SECRET }}
-          address: ${{ secrets.NOMAD_ADDR }}
-          job: ghost.nomad
-          # config: path/to/your/levant/config/file
