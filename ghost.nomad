@@ -26,7 +26,7 @@ job "ghost" {
           sleep 1
         done
       EOF
-      destination = "wait-for-db.sh"
+      destination = "local/wait-for-db.sh"
       perms = "755"
     }
     resources {
