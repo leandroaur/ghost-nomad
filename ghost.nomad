@@ -83,8 +83,8 @@ job "ghost" {
       "port": 465,
       "secure": true,
       "auth": {
-        "user": "contato@leandroaurelio.net",
-        "pass": "boggyz*5wuvqe"
+        "user": "${{ secrets.MAIL_USER }}",
+        "pass": "${{ secrets.MAIL_PASS }}"
       }
     }    
   },
