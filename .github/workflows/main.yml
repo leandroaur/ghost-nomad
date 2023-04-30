@@ -11,21 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup `nomad-pack`
-        # TODO: define `v1`
-        uses: hashicorp/setup-nomad-pack@v0.9.1
-        id: setup
-        with:
-          version: "0.0.1-techpreview2" # or `latest`
-
-      - name: Run `nomad-pack info` for `simple_service`
-        id: info
-        run: "nomad-pack info ./packs/simple_service"
-
       - name: Run `nomad-pack run` for `simple_service`
         id: run
         run: "nomad-pack run ./packs/simple_service"
         env:
           NOMAD_ADDR: "${{ secrets.NOMAD_ADDR }}"
+          NOMAD_JOB: ghost.nomad
           # NOMAD_TOKEN: "${{ secrets.NOMAD_TOKEN }}"
         continue-on-error: true
