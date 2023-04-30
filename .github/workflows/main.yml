@@ -25,4 +25,4 @@ jobs:
           
       - name: Run `nomad-pack info` for `nomad-ghost`
         id: info
-        run: "nomad-pack info ./"
+        run: "nomad-pack info ./ghost-nomad/"
