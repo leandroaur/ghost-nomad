@@ -1,21 +1,23 @@
-name: nomad-pack
-
-on:
-  - push
-
+name: Deploy Nomad Job
+on: [push]
 jobs:
-  setup-nomad-pack:
+  deploy:
+    name: Nomad Deploy
     runs-on: ubuntu-latest
-    name: Run Nomad Pack
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout the code
+        uses: actions/checkout@v1
 
-      - name: Run `nomad-pack run` for `simple_service`
-        id: run
-        run: "nomad run ghost.nomad"
-        env:
-          NOMAD_ADDR: "${{ secrets.NOMAD_ADDR }}"
-          NOMAD_JOB: ghost.nomad
-          # NOMAD_TOKEN: "${{ secrets.NOMAD_TOKEN }}"
-        continue-on-error: true
+      - name: Connect Tailscale
+        uses: tailscale/github-action@v1
+        with:
+          authkey: ${{ secrets.TAILSCALE_KEY }} 
+          version: 1.14.0
+
+      - name: Deploy with Nomad
+        uses: qazz92/nomad-deploy
+        with:
+          # token: ${{ secrets.YOUR_NOMAD_SECRET }}
+          address: ${{ secrets.NOMAD_ADDR }}
+          job: |-
+          # config: path/to/your/levant/config/file
