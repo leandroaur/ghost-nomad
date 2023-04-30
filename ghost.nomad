@@ -23,7 +23,6 @@ job "ghost" {
         memory = 128
       }
     }
-
  
     count = 2
 
