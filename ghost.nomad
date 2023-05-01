@@ -7,7 +7,6 @@ job "ghost" {
     max_parallel = 1
   }
 
-
   group "ghost" {
     task "wait-for-db" {
       lifecycle {
@@ -17,10 +16,8 @@ job "ghost" {
       driver = "docker"
       config {
         image = "alpine"
-        command = ["sh"]
-        args = ["-c", "while ! nc -z {{- range service \"db\" }}{{ .Address }}{{- end }} {{- range service \"db\" }}{{ .Port }}{{- end }}; do sleep 1; done"]
+        args = ["sh", "-c", "while ! nc -zv 100.73.246.57 3306; do sleep 1; done"]
       }
-      
       resources {
         cpu = 500
         memory = 128
