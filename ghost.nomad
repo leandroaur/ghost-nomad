@@ -16,20 +16,7 @@ job "ghost" {
       driver = "docker"
       config {
         image = "alpine"
-        command = ["sh", "-c", "nc -zv {{- range service \"db\" }}{{ .Address }}{{- end }} {{- range service \"db\" }}{{ .Port }}{{- end }}"]
-      }
-
-      template {
-        data = <<EOF
-          {{- with service "db" }}
-          {{- range . }}
-          {{- if eq (service.HealthService.CheckStatus) "passing" }}
-          {{- .Address }}:{{ .Port }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-        EOF
-        destination = "secrets/db_address"
+        args = ["sh", "-c", "while ! nc -zv 100.73.246.57 3306; do sleep 1; done"]
       }
       resources {
         cpu = 500
