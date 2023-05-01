@@ -9,17 +9,24 @@ job "ghost" {
 
   group "ghost" {
 
-    task "echo" {
+    task "test-db" {
       driver = "raw_exec"
 
-      config {
-        command = "/bin/echo"
-        args = ["Hello World"]
+      template {
+        data = <<EOF
+          {{ with service "db" }}
+          {{ range . }}
+          db-host={{ .Address }}
+          db-port={{ .Port }}
+          {{ end }}
+          {{ end }}
+        EOF
+        destination = "secrets/db.config"        
       }
 
-      restart {
-        mode = "fail"
-        attempts = 1
+      config {
+        command = "/bin/bash"
+        args = ["-c", "nc -zv $(cat secrets/db.config | grep db-host | cut -d'=' -f2) $(cat secrets/db.config | grep db-port | cut -d'=' -f2)"]
       }
     }
  
