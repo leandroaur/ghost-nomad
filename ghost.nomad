@@ -23,7 +23,7 @@ job "ghost" {
         data = <<EOF
           {{- with service "db" }}
           {{- range . }}
-          {{- if eq .CheckStatus "passing" }}
+          {{- if eq (service.HealthService.CheckStatus) "passing" }}
           {{- .Address }}:{{ .Port }}
           {{- end }}
           {{- end }}
