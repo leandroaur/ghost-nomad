@@ -8,12 +8,13 @@ job "ghost" {
   }
 
   group "ghost" {
-    
+
     task "test-task" {
       driver = "raw_exec"
 
       config {
-        command = "echo 'Hello World!'"
+        command = "/bin/echo"
+        args = ["Hello World"]
       }
     }
  
