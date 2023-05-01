@@ -9,12 +9,17 @@ job "ghost" {
 
   group "ghost" {
 
-    task "test-task" {
+    task "echo" {
       driver = "raw_exec"
 
       config {
         command = "/bin/echo"
         args = ["Hello World"]
+      }
+
+      restart {
+        mode = "fail"
+        attempts = 1
       }
     }
  
