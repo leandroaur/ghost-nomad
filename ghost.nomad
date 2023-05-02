@@ -9,26 +9,26 @@ job "ghost" {
 
   group "ghost" {
 
-    task "test-db" {
-      driver = "raw_exec"
+    #task "test-db" {
+      #driver = "raw_exec"
 
-      template {
-        data = <<EOF
-          {{ with service "db" }}
-          {{ range . }}
-          db-host={{ .Address }}
-          db-port={{ .Port }}
-          {{ end }}
-          {{ end }}
-        EOF
-        destination = "secrets/db.config"        
-      }
+      #template {
+        #data = <<EOF
+          #{{ with service "db" }}
+          #{{ range . }}
+          #db-host={{ .Address }}
+          #db-port={{ .Port }}
+          #{{ end }}
+          #{{ end }}
+        #EOF
+        #destination = "secrets/db.config"        
+      #}
 
-      config {
-        command = "/bin/bash"
-        args = ["-c", "nc -zv $(cat secrets/db.config | grep db-host | cut -d'=' -f2) $(cat secrets/db.config | grep db-port | cut -d'=' -f2)"]
-      }
-    }
+      #config {
+        #command = "/bin/bash"
+        #args = ["-c", "nc -zv $(cat secrets/db.config | grep db-host | cut -d'=' -f2) $(cat secrets/db.config | grep db-port | cut -d'=' -f2)"]
+      #}
+    #}
  
     count = 2
 
