@@ -24,6 +24,7 @@ jobs:
         run: |
           export NOMAD_ADDR=${{ secrets.NOMAD_ADDR }}
           nomad status
+          nomad job plan ghost.nomad
           nomad job run ghost.nomad
           # nomad job plan ghost.nomad
           # or nomad-pack run .
