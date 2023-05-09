@@ -23,9 +23,16 @@ jobs:
       - name: Deploy
         run: |
           export NOMAD_ADDR=${{ secrets.NOMAD_ADDR }}
+          plan_output=$(nomad job plan ghost.nomad)
+          echo "$plan_output"
+          if echo "$plan_output" | grep -q "job modify given matches"; then
+            nomad job run -check-index $(echo "$plan_output" | awk '{print $5}') ghost.nomad
+          else
+            echo "Job plan has changed since last run. Please review and modify the job accordingly."
+          fi
           nomad status
-          nomad job plan ghost.nomad
-          nomad job run ghost.nomad
+          # nomad job plan ghost.nomad
+          # nomad job run ghost.nomad
           # nomad job plan ghost.nomad
           # or nomad-pack run .
         env:
