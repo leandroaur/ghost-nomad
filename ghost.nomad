@@ -30,7 +30,7 @@ job "ghost" {
       #}
     #}
  
-    count = 1
+    count = 2
 
     volume "ghost" {
       type      = "host"
@@ -148,7 +148,7 @@ job "ghost" {
   }
 
   group "db" {
-    count = 1
+    count = 2
 
     volume "mysql" {
       type      = "host"
