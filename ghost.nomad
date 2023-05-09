@@ -30,7 +30,7 @@ job "ghost" {
       #}
     #}
  
-    count = 2
+    count = 3
 
     volume "ghost" {
       type      = "host"
