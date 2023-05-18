@@ -4,7 +4,7 @@ job "ghost" {
   
   update {
     stagger = "30s"
-    max_parallel = 1
+    max_parallel = 2
   }
 
   group "ghost" {
