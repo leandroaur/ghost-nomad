@@ -9,6 +9,10 @@ job "ghost" {
 
   group "ghost" {
 
+    update {
+      canary = 1
+    }
+
     #task "test-db" {
       #driver = "raw_exec"
 
@@ -149,6 +153,10 @@ job "ghost" {
 
   group "db" {
     count = 1
+
+    update {
+      min_healthy_time = "3m"
+    }
 
     volume "mysql" {
       type      = "host"
