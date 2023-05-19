@@ -152,7 +152,7 @@ job "ghost" {
   }
 
   group "db" {
-    count = 1
+    count = 2
 
     update {
       min_healthy_time = "3m"
