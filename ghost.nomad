@@ -36,10 +36,20 @@ job "ghost" {
  
     count = 1
 
-    volume "ghost" {
-      type      = "host"
-      read_only = false
-      source    = "ghost"
+#use this volume mode if you have a local volume or nfs installed
+#    volume "ghost" {
+#      type      = "host"
+#      read_only = false
+#      source    = "ghost"
+#    }
+
+#this volume mode is used when you have a csi volume (https://docs.ceph.com/en/latest/rbd/rbd-nomad/)
+    volume "ghost-csi" {
+      type            = "csi"
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
+      read_only       = false
+      source          = "ghost-csi"
     }
 
     restart {
@@ -53,7 +63,7 @@ job "ghost" {
       driver = "docker"
 
       volume_mount {
-        volume      = "ghost"
+        volume      = "ghost-csi"
         destination = "/var/lib/ghost/content"
         read_only   = false
       }
@@ -135,14 +145,6 @@ job "ghost" {
         }
       }
 
-#      template {
-#        data = <<EOH
-#          {{ range $i, $e := service "db" }}
-#          {{ if eq $i 0 }}{{ $e.Address }}{{ end }}
-#          {{ end }}:{{ env "NOMAD_PORT_ghost" }}
-#        EOH
-#        destination = "secrets/db_address"
-#      }
     }
     network {
       port "ghost" {
@@ -152,7 +154,7 @@ job "ghost" {
   }
 
   group "db" {
-    count = 2
+    count = 1
 
     update {
       min_healthy_time = "3m"
