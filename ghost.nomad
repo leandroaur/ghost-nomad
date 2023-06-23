@@ -34,7 +34,7 @@ job "ghost" {
       #}
     #}
  
-    count = 2
+    count = 1
 
 #use this volume mode if you have a local volume or nfs installed
 #    volume "ghost" {
@@ -47,7 +47,7 @@ job "ghost" {
     volume "ghost-csi" {
       type            = "csi"
       attachment_mode = "file-system"
-      access_mode     = "multi-node-single-writer" # it was using single-node-writer
+      access_mode     = "single-node-writer"
       read_only       = false
       source          = "ghost-csi"
     }
