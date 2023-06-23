@@ -47,7 +47,7 @@ job "ghost" {
     volume "ghost-csi" {
       type            = "csi"
       attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      access_mode     = "multi-node-single-writer" # it was using single-node-writer
       read_only       = false
       source          = "ghost-csi"
     }
