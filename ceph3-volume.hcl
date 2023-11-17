@@ -1,4 +1,3 @@
-#Use this volume model if you have a ceph volume as csi
 id = "ghost-csi"
 name = "ghost-csi"
 type = "csi"
@@ -13,12 +12,11 @@ capability {
 
 secrets {
   userID  = "admin"
-  userKey = "AQDSXGlkc/kiHxAAu0CX8Q/3SveVD0S47a88IA=="
+  userKey = "AQDCIGlkgSy/GRAACQGLPesLLnkNUi1GYqnjVg=="
 }
 
 parameters {
-  clusterID = "0f435b30-f745-11ed-a325-c62fc3e066af" #"<insert_the_id>"
+  clusterID = "0f435b30-f745-11ed-a325-c62fc3e066af"
   pool = "nomad"
   imageFeatures = "layering"
 }
-

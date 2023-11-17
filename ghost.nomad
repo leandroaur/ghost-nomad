@@ -37,20 +37,20 @@ job "ghost" {
     count = 1
 
 #use this volume mode if you have a local volume or nfs installed
-#    volume "ghost" {
-#      type      = "host"
-#      read_only = false
-#      source    = "ghost"
-#    }
+    volume "ghost" {
+      type      = "host"
+      read_only = false
+      source    = "ghost"
+    }
 
 #this volume mode is used when you have a csi volume (https://docs.ceph.com/en/latest/rbd/rbd-nomad/)
-    volume "ghost-csi" {
-      type            = "csi"
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
-      read_only       = false
-      source          = "ghost-csi"
-    }
+#    volume "ghost-csi" {
+#      type            = "csi"
+#      attachment_mode = "file-system"
+#      access_mode     = "single-node-writer"
+#      read_only       = false
+#      source          = "ghost-csi"
+#    }
 
     restart {
       attempts = 10
@@ -63,7 +63,7 @@ job "ghost" {
       driver = "docker"
 
       volume_mount {
-        volume      = "ghost-csi"
+        volume      = "ghost" #"ghost-csi"
         destination = "/var/lib/ghost/content"
         read_only   = false
       }
