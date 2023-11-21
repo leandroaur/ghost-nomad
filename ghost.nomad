@@ -34,7 +34,7 @@ job "ghost" {
       #}
     #}
  
-    count = 2
+    count = 1
 
 #use this volume mode if you have a local volume or nfs installed
     volume "ghost" {
