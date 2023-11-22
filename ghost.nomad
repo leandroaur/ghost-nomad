@@ -12,27 +12,6 @@ job "ghost" {
     update {
       canary = 1
     }
-
-    #task "test-db" {
-      #driver = "raw_exec"
-
-      #template {
-        #data = <<EOF
-          #{{ with service "db" }}
-          #{{ range . }}
-          #db-host={{ .Address }}
-          #db-port={{ .Port }}
-          #{{ end }}
-          #{{ end }}
-        #EOF
-        #destination = "secrets/db.config"        
-      #}
-
-      #config {
-        #command = "/bin/bash"
-        #args = ["-c", "nc -zv $(cat secrets/db.config | grep db-host | cut -d'=' -f2) $(cat secrets/db.config | grep db-port | cut -d'=' -f2)"]
-      #}
-    #}
  
     count = 1
 
@@ -42,15 +21,6 @@ job "ghost" {
       read_only = false
       source    = "ghost"
     }
-
-#this volume mode is used when you have a csi volume (https://docs.ceph.com/en/latest/rbd/rbd-nomad/)
-#    volume "ghost-csi" {
-#      type            = "csi"
-#      attachment_mode = "file-system"
-#      access_mode     = "single-node-writer"
-#      read_only       = false
-#      source          = "ghost-csi"
-#    }
 
     restart {
       attempts = 10
