@@ -4,7 +4,7 @@ job "ghost" {
   
   update {
     stagger = "30s"
-    max_parallel = 1
+    max_parallel = 2
   }
 
   group "ghost" {
@@ -13,7 +13,7 @@ job "ghost" {
       canary = 1
     }
  
-    count = 2
+    count = 1
 
 #use this volume mode if you have a local volume or nfs installed
     volume "ghost" {
