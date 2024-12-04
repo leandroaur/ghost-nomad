@@ -12,8 +12,15 @@ job "ghost" {
     update {
       canary = 1
     }
-
+ 
     count = 1
+
+#use this volume mode if you have a local volume or nfs installed
+    volume "ghost" {
+      type      = "host"
+      read_only = false
+      source    = "ghost"
+    }
 
     restart {
       attempts = 10
@@ -25,19 +32,25 @@ job "ghost" {
     task "ghost" {
       driver = "docker"
 
+      volume_mount {
+        volume      = "ghost" #"ghost-csi"
+        destination = "/var/lib/ghost/content"
+        read_only   = false
+      }
+
       config {
         image = "ghost:5-alpine"
 
         ports = ["ghost"]
         volumes = [
-          "config/ghost-config.js:/var/lib/ghost/config.production.json"
+        "config/ghost-config.js:/var/lib/ghost/config.production.json",
         ]
       }
 
       template {
         data = <<EOF
 {
-  "url": "http://blog.leandroaurelio.com",
+  "url": "https://leandroaurelio.com",
   "server": {
     "port": 2368,
     "host": "::"
@@ -78,10 +91,11 @@ job "ghost" {
 }
         EOF
         destination = "config/ghost-config.js"
+
       }
 
       env = {
-        "NODE_ENV" = "development"
+        "NODE_ENV" = "production"
       }
 
       resources {
@@ -92,7 +106,7 @@ job "ghost" {
       service {
         name = "ghost"
         port = "ghost"
-        tags = [ "urlprefix-blog.leandroaurelio.com/" ]
+        tags = [ "urlprefix-leandroaurelio.com/" ]
 
         check {
           type     = "tcp"
@@ -100,8 +114,8 @@ job "ghost" {
           timeout  = "2s"
         }
       }
-    }
 
+    }
     network {
       port "ghost" {
         static = 2368
@@ -116,6 +130,12 @@ job "ghost" {
       min_healthy_time = "3m"
     }
 
+    volume "mysql" {
+      type      = "host"
+      read_only = false
+      source    = "mysql"
+    }
+
     restart {
       attempts = 10
       interval = "5m"
@@ -126,9 +146,10 @@ job "ghost" {
     task "db" {
       driver = "docker"
 
-      config {
-        image = "mysql:8.0"
-        ports = ["db"]
+      volume_mount {
+        volume      = "mysql"
+        destination = "/var/lib/mysql"
+        read_only   = false
       }
 
       env = {
@@ -136,6 +157,12 @@ job "ghost" {
         "MYSQL_DATABASE" = "ghostdata"
         "MYSQL_USER" = "ghostusr"
         "MYSQL_PASSWORD" = "password"
+      }
+
+      config {
+        image = "mysql:8.0"
+
+        ports = ["db"]
       }
 
       resources {
@@ -154,7 +181,6 @@ job "ghost" {
         }
       }
     }
-
     network {
       port "db" {
         static = 3306
@@ -162,4 +188,3 @@ job "ghost" {
     }
   }
 }
-
