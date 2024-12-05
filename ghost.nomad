@@ -31,6 +31,7 @@ job "ghost" {
         ports = ["ghost"]
         volumes = [
           "config/ghost-config.js:/var/lib/ghost/config.production.json"
+          "local/ghost-content:/var/lib/ghost/content"
         ]
       }
 
