@@ -105,7 +105,7 @@ job "ghost" {
 
     network {
       port "ghost" {
-        static = 2368
+        to = 2368
       }
     }
   }
