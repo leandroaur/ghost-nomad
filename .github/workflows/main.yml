@@ -1,7 +1,9 @@
 name: nomad-pack
 
 on:
-  - push
+  push:
+    branches:
+      - main
 
 jobs:
   setup-nomad-pack:
@@ -13,12 +15,12 @@ jobs:
 
       - name: Deploy nomad
         uses: rluisr/nomad-actions@master
-          
+
       - name: Deploy
         run: |
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
           nomad job plan ghost.nomad
-          nomad job run -force ghost.nomad
+          nomad job run ghost.nomad
           nomad status
         env:
           NOMAD_ADDR: "https://nomad.leandroaurelio.com"
