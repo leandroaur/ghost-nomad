@@ -19,7 +19,7 @@ jobs:
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
           # Certifique-se de que a URL esteja correta para o seu proxy Nginx
           nomad job plan ghost.nomad
-          nomad job run ghost.nomad
+          nomad job run -force ghost.nomad
           nomad status
         env:
           NOMAD_ADDR: "https://nomad.leandroaurelio.com"
