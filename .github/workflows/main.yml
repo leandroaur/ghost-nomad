@@ -1,9 +1,7 @@
 name: nomad-pack
 
 on:
-  push:
-    branches:
-      - main
+ - push
 
 jobs:
   setup-nomad-pack:
