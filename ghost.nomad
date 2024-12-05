@@ -130,6 +130,9 @@ job "ghost" {
       config {
         image = "mysql:8.0"
         ports = ["db"]
+        volumes = [
+          "local/mysql-data:/var/lib/mysql"
+        ]
       }
 
       env = {
