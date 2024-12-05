@@ -17,7 +17,6 @@ jobs:
       - name: Deploy
         run: |
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
-          # Certifique-se de que a URL esteja correta para o seu proxy Nginx
           nomad job plan ghost.nomad
           nomad job run -force ghost.nomad
           nomad status
