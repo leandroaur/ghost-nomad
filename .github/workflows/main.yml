@@ -11,31 +11,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Connect Tailscale
-        uses: tailscale/github-action@v1
-        with:
-          authkey: ${{ secrets.TAILSCALE_KEY }} 
-          version: 1.14.0
-
       - name: Deploy nomad
         uses: rluisr/nomad-actions@master
           
       - name: Deploy
         run: |
-          export NOMAD_ADDR=${{ secrets.NOMAD_ADDR }}
+          export NOMAD_ADDR="https://nomad.leandroaurelio.com"
+          # Certifique-se de que a URL esteja correta para o seu proxy Nginx
           nomad job plan ghost.nomad
-          # plan_output=$(nomad job plan ghost.nomad)
-          # echo "$plan_output"
-          # if echo "$plan_output" | grep -q "job modify given matches"; then
-          # nomad job run -check-index $(echo "$plan_output" | awk '{print $5}') ghost.nomad
-          # else
-          # echo "Job plan has changed since last run. Please review and modify the job accordingly."
-          # fi
-          nomad status
           nomad job run ghost.nomad
-          # nomad job plan ghost.nomad
-          # nomad job run ghost.nomad
-          # nomad job plan ghost.nomad
-          # or nomad-pack run .
+          nomad status
         env:
-          NOMAD_ADDR: "{{ secrets.NOMAD_ADDR }}"
+          NOMAD_ADDR: "https://nomad.leandroaurelio.com"
