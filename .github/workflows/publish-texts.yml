@@ -15,7 +15,7 @@ jobs:
     - name: Publish to Ghost via API
       run: |
         for file in texts/*.md; do
-          curl -X POST "$GHOST_API_URL/ghost/api/v3/content/posts/" \
+          curl -X POST "https://blog.leandroaurelio.com/ghost/api/v3/content/posts/" \
             -H "Authorization: Ghost $GHOST_ADMIN_API_KEY" \
             -F "posts=@$file"
         done
