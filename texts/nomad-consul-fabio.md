@@ -5,6 +5,7 @@ Nomad, Consul e Fabio são ferramentas poderosas para gerenciar workloads, confi
 
 ## Passo 1: Instalando o Nomad
 1. **Faça o download do Nomad** no site oficial ou use um gerenciador de pacotes (ex.: `apt` ou `yum`).
+![Logo do Nomad](../images/nomad-logo.svg)
 2. **Configure o agente do Nomad**:
    - Crie o arquivo `nomad.hcl` com as configurações básicas.
    - Use o comando `nomad agent -dev` para testes.
