@@ -23,6 +23,9 @@ jobs:
         python3 -m pip install --upgrade pip
         pip install pyjwt
 
+    - name: Check GHOST_ADMIN_API_KEY
+      run: echo "GHOST_ADMIN_API_KEY=$GHOST_ADMIN_API_KEY"
+
     - name: Generate JWT token for Ghost API
       run: |
         JWT_TOKEN=$(python3 generate_jwt.py "$GHOST_ADMIN_API_KEY")
