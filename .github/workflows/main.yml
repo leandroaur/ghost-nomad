@@ -18,7 +18,9 @@ jobs:
         run: |
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
 
-          # Substituir placeholders pelos segredos
+          # Substituir placeholders pelos secrets
+          sed -i "s|__USER_MAIL__|${{ secrets.USER_MAIL }}|g" ghost.nomad
+          sed -i "s|__USER_PASSWORD__|${{ secrets.USER_PASSWORD }}|g" ghost.nomad
           sed -i "s|__MYSQL_ROOT_PASSWORD__|${{ secrets.MYSQL_ROOT_PASSWORD }}|g" ghost.nomad
           sed -i "s|__MYSQL_DATABASE__|${{ secrets.MYSQL_DATABASE }}|g" ghost.nomad
           sed -i "s|__MYSQL_USER__|${{ secrets.MYSQL_USER }}|g" ghost.nomad

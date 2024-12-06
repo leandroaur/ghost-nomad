@@ -61,8 +61,8 @@ job "ghost" {
       "port": 465,
       "secure": true,
       "auth": {
-        "user": "user@mail.com",
-        "pass": "password"
+        "user": "__USER_MAIL__",
+        "pass": "__USER_PASSWORD__"
       }
     }    
   },
