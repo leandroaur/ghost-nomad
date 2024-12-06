@@ -1,26 +1,24 @@
-# Configurando Nomad, Consul e Fabio no seu Ambiente
+# Setting up Nomad, Consul, and Fabio in Your Environment
 
-## Introdução
-Nomad, Consul e Fabio são ferramentas poderosas para gerenciar workloads, configurar serviços distribuídos e implementar balanceadores de carga. Este guia mostrará como instalá-los e configurá-los em um ambiente de homelab.
+## Introduction
+Nomad, Consul, and Fabio are powerful tools for managing workloads, configuring distributed services, and implementing load balancers. This guide will show you how to install and configure them in a homelab environment.
 
-## Passo 1: Instalando o Nomad
-1. **Faça o download do Nomad** no site oficial ou use um gerenciador de pacotes (ex.: `apt` ou `yum`).
-![Logo do Nomad](../images/nomad-logo.svg)
-2. **Configure o agente do Nomad**:
-   - Crie o arquivo `nomad.hcl` com as configurações básicas.
-   - Use o comando `nomad agent -dev` para testes.
+## Step 1: Installing Nomad
+1. **Download Nomad** from the official website or use a package manager (e.g., `apt` or `yum`).
+![Nomad Logo](../images/nomad-logo.svg)
+2. **Configure the Nomad agent**:
+   - Create the `nomad.hcl` file with basic configurations.
+   - Use the command `nomad agent -dev` for testing.
 
-## Passo 2: Instalando o Consul
-1. Instale o Consul com `apt` ou baixe diretamente o binário.
-2. Configure o agente do Consul:
-   - Crie um arquivo `consul.hcl` para configurar o datacenter e a comunicação com outros agentes.
+## Step 2: Installing Consul
+1. Install Consul with `apt` or download the binary directly.
+2. Configure the Consul agent:
+   - Create a `consul.hcl` file to configure the datacenter and communication with other agents.
 
-## Passo 3: Configurando Fabio como Load Balancer
-1. Baixe o Fabio no [repositório oficial](https://github.com/fabiolb/fabio).
-2. Adicione as configurações básicas no arquivo `fabio.properties`: registry.consul.addr=localhost:8500 registry.consul.tagprefix=urlprefix-
-3. Inicie o Fabio e verifique se ele registra os serviços corretamente no Consul.
+## Step 3: Configuring Fabio as a Load Balancer
+1. Download Fabio from the [official repository](https://github.com/fabiolb/fabio).
+2. Add basic configurations in the `fabio.properties` file: registry.consul.addr=localhost:8500 registry.consul.tagprefix=urlprefix-
+3. Start Fabio and verify that it correctly registers services in Consul.
 
-## Conclusão
-Após seguir esses passos, você terá um ambiente funcional com Nomad, Consul e Fabio. Enfrentei problemas comuns como conflitos de portas e serviços não sendo registrados, que podem ser resolvidos ajustando configurações nos arquivos `*.hcl`.
-
-
+## Conclusion
+After following these steps, you will have a functional environment with Nomad, Consul, and Fabio. I encountered common issues such as port conflicts and unregistered services, which can be resolved by adjusting configurations in the `*.hcl` files.
