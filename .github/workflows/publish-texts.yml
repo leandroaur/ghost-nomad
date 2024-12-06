@@ -34,7 +34,11 @@ jobs:
 
     - name: Publish to Ghost via API
       run: |
-        curl -X POST "https://blog.leandroaurelio.com/ghost/api/admin/posts/" \
-          -H "Authorization: Ghost $JWT_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d @texts/post.json
+        for file in texts/*.json; do
+          if [ -f "$file" ]; then
+            curl -X POST "https://blog.leandroaurelio.com/ghost/api/admin/posts/" \
+              -H "Authorization: Ghost $JWT_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d @"$file"
+          fi
+        done
