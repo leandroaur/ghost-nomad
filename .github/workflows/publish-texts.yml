@@ -24,11 +24,11 @@ jobs:
         pip install pyjwt
 
     - name: Check GHOST_ADMIN_API_KEY
-      run: echo "GHOST_ADMIN_API_KEY=$GHOST_ADMIN_API_KEY"
+      run: echo "GHOST_ADMIN_API_KEY=${{ secrets.GHOST_ADMIN_API_KEY }}"
 
     - name: Generate JWT token for Ghost API
       run: |
-        JWT_TOKEN=$(python3 generate_jwt.py "$GHOST_ADMIN_API_KEY")
+        JWT_TOKEN=$(python3 generate_jwt.py "${{ secrets.GHOST_ADMIN_API_KEY }}")
         echo "JWT_TOKEN=$JWT_TOKEN" >> $GITHUB_ENV
         echo "JWT_TOKEN=$JWT_TOKEN"
 
