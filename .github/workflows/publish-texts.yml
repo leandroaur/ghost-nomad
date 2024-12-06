@@ -34,11 +34,21 @@ jobs:
 
     - name: Publish to Ghost via API
       run: |
-        for file in texts/*.json; do
+        for file in $(ls -t texts/*.json); do  # Ordena por data de modificação
           if [ -f "$file" ]; then
-            curl -X POST "https://blog.leandroaurelio.com/ghost/api/admin/posts/" \
+            echo "Publishing $file"
+            response=$(curl -s -X POST "https://blog.leandroaurelio.com/ghost/api/admin/posts/" \
               -H "Authorization: Ghost $JWT_TOKEN" \
               -H "Content-Type: application/json" \
-              -d @"$file"
+              -d @"$file")
+            echo "Response: $response"
+        
+            if echo "$response" | grep -q "ValidationError"; then
+              echo "Error publishing $file: Validation failed"
+              continue
+            else
+              echo "Published $file successfully"
+              break
+            fi
           fi
         done
