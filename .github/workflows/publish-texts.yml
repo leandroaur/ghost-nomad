@@ -27,6 +27,7 @@ jobs:
       run: |
         JWT_TOKEN=$(python3 generate_jwt.py "$GHOST_ADMIN_API_KEY")
         echo "JWT_TOKEN=$JWT_TOKEN" >> $GITHUB_ENV
+        echo "JWT_TOKEN=$JWT_TOKEN"
 
     - name: Publish to Ghost via API
       run: |
