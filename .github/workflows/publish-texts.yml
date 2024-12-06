@@ -12,9 +12,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Publish to Ghost
-      uses: TryGhost/action-publish@v1
-      with:
-        api-url: ${{ secrets.GHOST_API_URL }}
-        admin-api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
-        content-folder: texts/
+    - name: Publish to Ghost via API
+      run: |
+        for file in texts/*.md; do
+          curl -X POST "$GHOST_API_URL/ghost/api/v3/content/posts/" \
+            -H "Authorization: Ghost $GHOST_ADMIN_API_KEY" \
+            -F "posts=@$file"
+        done
