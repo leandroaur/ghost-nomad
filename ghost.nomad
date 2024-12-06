@@ -136,10 +136,10 @@ job "ghost" {
       }
 
       env = {
-        "MYSQL_ROOT_PASSWORD" = "password"
-        "MYSQL_DATABASE" = "ghostdata"
-        "MYSQL_USER" = "ghostusr"
-        "MYSQL_PASSWORD" = "password"
+        "MYSQL_ROOT_PASSWORD" = "${{ secrets.MYSQL_ROOT_PASSWORD }}"
+        "MYSQL_DATABASE" = "${{ secrets.MYSQL_DATABASE }}"
+        "MYSQL_USER" = "${{ secrets.MYSQL_USER }}"
+        "MYSQL_PASSWORD" = "${{ secrets.MYSQL_PASSWORD }}"
       }
 
       resources {
