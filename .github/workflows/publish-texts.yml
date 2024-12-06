@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'texts/**'
+      - 'images/**'
 
 jobs:
   publish:
@@ -16,6 +17,11 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install pyjwt
 
     - name: Generate JWT token for Ghost API
       run: |
