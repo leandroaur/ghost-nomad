@@ -12,10 +12,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Generate JWT token for Ghost API
+      run: |
+        JWT_TOKEN=$(python3 generate_jwt.py "$GHOST_ADMIN_API_KEY")
+        echo "JWT_TOKEN=$JWT_TOKEN" >> $GITHUB_ENV
+
     - name: Publish to Ghost via API
       run: |
-        for file in texts/*.md; do
-          curl -X POST "https://blog.leandroaurelio.com/ghost/api/v3/content/posts/" \
-            -H "Authorization: Ghost $GHOST_ADMIN_API_KEY" \
-            -F "posts=@$file"
-        done
+        curl -X POST "https://blog.leandroaurelio.com/ghost/api/admin/posts/" \
+          -H "Authorization: Ghost $JWT_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d @texts/post.json
