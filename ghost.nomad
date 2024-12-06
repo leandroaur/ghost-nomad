@@ -161,7 +161,7 @@ job "ghost" {
 
     network {
       port "db" {
-        static = 3306
+        to = 3306
       }
     }
   }
