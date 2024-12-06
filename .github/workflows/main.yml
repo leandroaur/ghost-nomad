@@ -17,6 +17,12 @@ jobs:
       - name: Deploy
         run: |
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
+
+          # Substituir placeholders pelos segredos
+          sed -i "s|__MYSQL_ROOT_PASSWORD__|${{ secrets.MYSQL_ROOT_PASSWORD }}|g" ghost.nomad
+          sed -i "s|__MYSQL_DATABASE__|${{ secrets.MYSQL_DATABASE }}|g" ghost.nomad
+          sed -i "s|__MYSQL_USER__|${{ secrets.MYSQL_USER }}|g" ghost.nomad
+          sed -i "s|__MYSQL_PASSWORD__|${{ secrets.MYSQL_PASSWORD }}|g" ghost.nomad
           
           # Planeja o job e captura o Job Modify Index
           INDEX=$(nomad job plan ghost.nomad | grep "Job Modify Index" | awk '{print $4}')

@@ -48,9 +48,9 @@ job "ghost" {
     "connection": {
       "host": "{{- range service "db" }}{{ .Address }}{{- end }}",
       "port": "{{- range service "db" }}{{ .Port }}{{- end }}",
-      "user": "ghostusr",
-      "password": "password",
-      "database": "ghostdata"
+      "user": "__MYSQL_USER__",
+      "password": "__MYSQL_PASSWORD__",
+      "database": "__MYSQL_DATABASE__"
     }
   },
   "mail": {
@@ -136,10 +136,10 @@ job "ghost" {
       }
 
       env = {
-        "MYSQL_ROOT_PASSWORD" = "${{ secrets.MYSQL_ROOT_PASSWORD }}"
-        "MYSQL_DATABASE" = "${{ secrets.MYSQL_DATABASE }}"
-        "MYSQL_USER" = "${{ secrets.MYSQL_USER }}"
-        "MYSQL_PASSWORD" = "${{ secrets.MYSQL_PASSWORD }}"
+        "MYSQL_ROOT_PASSWORD" = "__MYSQL_ROOT_PASSWORD__"
+        "MYSQL_DATABASE" = "__MYSQL_DATABASE__"
+        "MYSQL_USER" = "__MYSQL_USER__"
+        "MYSQL_PASSWORD" = "__MYSQL_PASSWORD__"
       }
 
       resources {
