@@ -10,8 +10,5 @@ WORKDIR /var/lib/ghost
 # Copiar o diretório de imagens para o container
 COPY images/ /var/lib/ghost/content/images/
 
-# Instalar dependências do Node.js e configurar o Ghost
-RUN npm install --production
-
 # Comando para rodar o Ghost
-CMD ["npm", "start"]
+CMD ["docker-entrypoint.sh", "npm", "start"]
