@@ -3,16 +3,17 @@ job "ghost" {
   type = "service"
   
   update {
-    stagger      = "30s"
+    stagger = "30s"
     max_parallel = 2
   }
 
   group "ghost" {
-    count = 1
 
     update {
       canary = 1
     }
+
+    count = 1
 
     restart {
       attempts = 10
@@ -80,22 +81,8 @@ job "ghost" {
         destination = "config/ghost-config.js"
       }
 
-      template {
-        data = <<EOT
-#!/bin/sh
-# Cria o diretório de conteúdo, se não existir
-mkdir -p /var/lib/ghost/content/images
-
-# Copia os arquivos para o diretório de conteúdo
-cp -r /images/* /var/lib/ghost/content/images/
-EOT
-    destination = "local/setup-content.sh"
-    perms = "0755"
-      }
-
-      config {
-        command = "/bin/sh"
-        args = ["local/setup-content.sh"]
+      env = {
+        "NODE_ENV" = "development"
       }
 
       resources {
@@ -106,7 +93,7 @@ EOT
       service {
         name = "ghost"
         port = "ghost"
-        tags = ["urlprefix-blog.leandroaurelio.com/"]
+        tags = [ "urlprefix-blog.leandroaurelio.com/" ]
 
         check {
           type     = "tcp"
@@ -119,6 +106,62 @@ EOT
     network {
       port "ghost" {
         to = 2368
+      }
+    }
+  }
+
+  group "db" {
+    count = 1
+
+    update {
+      min_healthy_time = "3m"
+    }
+
+    restart {
+      attempts = 10
+      interval = "5m"
+      delay    = "25s"
+      mode     = "delay"
+    }
+
+    task "db" {
+      driver = "docker"
+
+      config {
+        image = "mysql:8.0"
+        ports = ["db"]
+        volumes = [
+          "local/mysql-data:/var/lib/mysql"
+        ]
+      }
+
+      env = {
+        "MYSQL_ROOT_PASSWORD" = "__MYSQL_ROOT_PASSWORD__"
+        "MYSQL_DATABASE" = "__MYSQL_DATABASE__"
+        "MYSQL_USER" = "__MYSQL_USER__"
+        "MYSQL_PASSWORD" = "__MYSQL_PASSWORD__"
+      }
+
+      resources {
+        cpu    = 1024
+        memory = 1024
+      }
+
+      service {
+        name = "db"
+        port = "db"
+
+        check {
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+    }
+
+    network {
+      port "db" {
+        to = 3306
       }
     }
   }
