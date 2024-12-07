@@ -16,8 +16,7 @@ jobs:
 
       - name: Copy image files to ghost-content
         run: |
-          mkdir -p local/ghost-content  
-          cp -r images/* local/ghost-content/
+          cp -r images/* ./local/ghost-content/
 
       - name: Deploy nomad
         uses: rluisr/nomad-actions@master
