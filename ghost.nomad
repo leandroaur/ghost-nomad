@@ -33,6 +33,8 @@ job "ghost" {
           "config/ghost-config.js:/var/lib/ghost/config.production.json",
           "local/ghost-content:/var/lib/ghost/content"
         ]
+        command = "sh"
+        args = ["-c", "cp -r /images/* /var/lib/ghost/content/images/ && node current/index.js"]
       }
 
       template {
