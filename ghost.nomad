@@ -83,11 +83,14 @@ job "ghost" {
       template {
         data = <<EOT
 #!/bin/sh
-mkdir -p /local/ghost-content
-cp -r /images/* /local/ghost-content/
+# Cria o diretório de conteúdo, se não existir
+mkdir -p /var/lib/ghost/content/images
+
+# Copia os arquivos para o diretório de conteúdo
+cp -r /images/* /var/lib/ghost/content/images/
 EOT
-        destination = "local/setup-content.sh"
-        perms = "0755"
+    destination = "local/setup-content.sh"
+    perms = "0755"
       }
 
       config {

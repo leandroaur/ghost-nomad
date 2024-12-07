@@ -14,10 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Copy image files to ghost-content
-        run: |
-          cp -r images/* ./local/ghost-content/
-
       - name: Deploy nomad
         uses: rluisr/nomad-actions@master
 
