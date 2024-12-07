@@ -9,7 +9,7 @@ ENV GHOST_CONTENT /var/lib/ghost/content
 # COPY ./seus-temas /var/lib/ghost/content/themes
 
 # Copiar imagens para o diretório de conteúdo do Ghost
-COPY images/ /var/lib/ghost/content/images/bucket/
+COPY images/ /var/lib/ghost/content/images/
 
 # Configuração de permissões (caso necessário)
 RUN chown -R node:node $GHOST_CONTENT
