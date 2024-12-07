@@ -8,6 +8,9 @@ ENV GHOST_CONTENT /var/lib/ghost/content
 # Exemplo: Adicionar temas, configurar email ou outro conteúdo
 # COPY ./seus-temas /var/lib/ghost/content/themes
 
+# Copiar imagens para o diretório de conteúdo do Ghost
+COPY images/ /var/lib/ghost/content/images/bucket/
+
 # Configuração de permissões (caso necessário)
 RUN chown -R node:node $GHOST_CONTENT
 
