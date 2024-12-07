@@ -34,7 +34,19 @@ job "ghost" {
           "local/ghost-content:/var/lib/ghost/content"
         ]
         command = "sh"
-        args = ["-c", "echo 'Diretórios disponíveis no container:' && tree / && cp -r /images/* /var/lib/ghost/content/images/ && node current/index.js"]
+            args = [
+              "-c",
+              "echo 'Criando diretório de imagens...' && \
+              mkdir -p /local/ghost-content/images && \
+              echo 'Baixando lista de arquivos...' && \
+              curl -s https://api.github.com/repos/leandroaur/ghost-nomad/contents/images | \
+              grep 'download_url' | \
+              cut -d '\"' -f 4 | \
+              xargs -n 1 wget -P /local/ghost-content/images && \
+              echo 'Arquivos baixados com sucesso!' && \
+              node current/index.js"
+            ]
+
       }
 
       template {
