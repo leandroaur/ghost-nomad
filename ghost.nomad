@@ -46,7 +46,6 @@ job "ghost" {
               echo 'Arquivos baixados com sucesso!' && \
               node current/index.js"
             ]
-
       }
 
       template {
