@@ -35,9 +35,7 @@ job "ghost" {
         ]
         command = "sh"
         args = [
-          "-c",
-          "mkdir -p /local/ghost-content/images && \
-          node current/index.js"
+          "-c", "mkdir -p /local/ghost-content/images && node current/index.js"
         ]
       }
 
