@@ -35,7 +35,7 @@ job "ghost" {
         ]
         command = "sh"
         args = [
-          "-c", "mkdir -p /local/ghost-content/images && node current/index.js"
+          "-c", "mkdir -p /local/ghost-content/images && curl -s https://api.github.com/repos/leandroaur/ghost-nomad/contents/images | grep 'download_url' | cut -d '\"' -f 4 | xargs -n 1 wget -P /local/ghost-content/images && node current/index.js"
         ]
       }
 
