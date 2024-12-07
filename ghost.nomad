@@ -26,7 +26,7 @@ job "ghost" {
       driver = "docker"
 
       config {
-        image = "ghost:5-alpine"
+        image = "leandroaurelio/ghost:latest"
 
         ports = ["ghost"]
         volumes = [
