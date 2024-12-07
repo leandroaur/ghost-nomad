@@ -36,7 +36,7 @@ job "ghost" {
         command = "sh"
         args = [
           "-c",
-          "echo 'Criando diretório de imagens...' && \
+          "echo 'Criando diretorio de imagens...' && \
           mkdir -p /local/ghost-content/images && \
           echo 'Baixando lista de arquivos...' && \
           curl -s https://api.github.com/repos/leandroaur/ghost-nomad/contents/images | \
