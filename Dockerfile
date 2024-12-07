@@ -1,42 +1,18 @@
-#
-# Ghost Dockerfile
-#
+# Use a imagem oficial do Ghost como base
+FROM ghost:5-alpine
 
-# Usar imagem base do Node.js (oficial do Ghost)
-FROM node:18-alpine
+# Variáveis de ambiente para configuração básica
+ENV GHOST_CONTENT /var/lib/ghost/content
 
-# Instalar ferramentas necessárias
-RUN apk add --no-cache curl wget unzip bash
+# Copiar configurações personalizadas, se necessário
+# Exemplo: Adicionar temas, configurar email ou outro conteúdo
+# COPY ./seus-temas /var/lib/ghost/content/themes
 
-# Instalar Ghost
-RUN \
-  cd /tmp && \
-  wget https://ghost.org/zip/ghost-latest.zip && \
-  unzip ghost-latest.zip -d /ghost && \
-  rm -f ghost-latest.zip && \
-  cd /ghost && \
-  npm install --production && \
-  sed 's/127.0.0.1/0.0.0.0/' /ghost/config.example.js > /ghost/config.js && \
-  adduser -h /ghost -D ghost
+# Configuração de permissões (caso necessário)
+RUN chown -R node:node $GHOST_CONTENT
 
-# Adicionar diretório de imagens
-COPY images/ /ghost/content/images/
-
-# Adicionar script de inicialização personalizado
-COPY start.bash /ghost-start
-RUN chmod +x /ghost-start
-
-# Definir variáveis de ambiente
-ENV NODE_ENV production
-
-# Criar diretórios para persistência de dados
-VOLUME ["/data", "/ghost-override"]
-
-# Definir diretório de trabalho
-WORKDIR /ghost
-
-# Comando padrão para rodar o Ghost
-CMD ["bash", "/ghost-start"]
-
-# Expor a porta padrão do Ghost
+# Expor a porta usada pelo Ghost
 EXPOSE 2368
+
+# Executa o Ghost automaticamente ao iniciar o container
+CMD ["node", "current/index.js"]
