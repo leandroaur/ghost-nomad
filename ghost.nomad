@@ -34,7 +34,7 @@ job "ghost" {
           "local/ghost-content:/var/lib/ghost/content"
         ]
         command = "sh"
-        args = ["-c", "cp -r /images/* /var/lib/ghost/content/images/ && node current/index.js"]
+        args = ["-c", "echo 'Diretórios disponíveis no container:' && tree / && cp -r /images/* /var/lib/ghost/content/images/ && node current/index.js"]
       }
 
       template {
