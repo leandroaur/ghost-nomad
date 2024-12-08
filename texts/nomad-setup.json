@@ -1,0 +1,13 @@
+{
+    "posts": [
+        {
+            "title": "nomad-setup",
+            "status": "draft",
+            "mobiledoc": "{\"version\": \"0.3.1\", \"atoms\": [], \"cards\": [[\"markdown\", {\"markdown\": \"# Setting up Nomad, Consul, and Fabio in Your Environment\\n\\n## Introduction\\n\\nNomad, Consul, and Fabio are powerful tools for managing workloads, configuring distributed services, and implementing load balancers. This guide will show you how to install and configure them in a homelab environment.\\n\\n![Nomad Logo](https://your-domain.com/content/images/2024/12/nomad-logo.svg)\\n\\n## Step 1: Installing Nomad\\n\\n1. **Download Nomad** from the official website or use a package manager (e.g., `apt` or `yum`).\\n2. **Configure the Nomad agent**:\\n   - Create the `nomad.hcl` file with basic configurations.\\n   - Use the command `nomad agent -dev` for testing.\\n\\n## Step 2: Installing Consul\\n\\n1. Install Consul with `apt` or download the binary directly.\\n2. Configure the Consul agent:\\n   - Create a `consul.hcl` file to configure the datacenter and communication with other agents.\\n\\n## Step 3: Configuring Fabio as a Load Balancer\\n\\n1. Download Fabio from the official repository.\\n2. Add basic configurations in the `fabio.properties` file:\\n   - `registry.consul.addr=localhost:8500`\\n   - `registry.consul.tagprefix=urlprefix-`\\n3. Start Fabio and verify that it correctly registers services in Consul.\\n\\n## Conclusion\\n\\nAfter following these steps, you will have a functional environment with Nomad, Consul, and Fabio. Common issues, such as port conflicts and unregistered services, can be resolved by adjusting configurations in the `*.hcl` files.\\n\\n---\\n\\nThis is a basic guide to get you started with these tools. Happy learning!\\n\"}]], \"markups\": [], \"sections\": [[10, 0]]}",
+            "published_at": "2024-12-08T00:26:42.785242",
+            "created_at": "2024-12-08T00:26:42.785242",
+            "updated_at": "2024-12-08T00:26:42.785242",
+            "slug": "nomad-setup"
+        }
+    ]
+}
