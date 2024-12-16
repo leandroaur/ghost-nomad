@@ -38,7 +38,7 @@ job "ghost" {
       template {
         data = <<EOF
 {
-  "url": "http://"__SITE_URL__"",
+  "url": "http://__SITE_URL__",
   "server": {
     "port": 2368,
     "host": "::"
@@ -93,7 +93,7 @@ job "ghost" {
       service {
         name = "ghost"
         port = "ghost"
-        tags = [ "urlprefix-"__SITE_URL__"/" ]
+        tags = [ "urlprefix-__SITE_URL__/" ]
 
         check {
           type     = "tcp"
