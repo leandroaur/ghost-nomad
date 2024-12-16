@@ -35,7 +35,9 @@ jobs:
 
       - name: Deploy
         run: |
-          export NOMAD_ADDR="https://nomad.leandroaurelio.com"
+          # Substituir placeholders pelos secrets
+          sed -i "s|__SITE_URL__|${{ secrets.SITE_URL }}|g" ghost.nomad
+          export NOMAD_ADDR="${{ secrets.SITE_URL }}"
 
           # Substituir placeholders pelos secrets
           sed -i "s|__USER_MAIL__|${{ secrets.USER_MAIL }}|g" ghost.nomad

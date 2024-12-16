@@ -37,7 +37,7 @@ jobs:
         for file in $(ls -t texts/*.json); do  # Ordena por data de modificação
           if [ -f "$file" ]; then
             echo "Publishing $file"
-            response=$(curl -s -X POST "https://blog.leandroaurelio.com/ghost/api/admin/posts/" \
+            response=$(curl -s -X POST "https://"${{ secrets.SITE_URL }}"/ghost/api/admin/posts/" \
               -H "Authorization: Ghost $JWT_TOKEN" \
               -H "Content-Type: application/json" \
               -d @"$file")
