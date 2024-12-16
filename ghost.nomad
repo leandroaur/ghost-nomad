@@ -6,7 +6,7 @@ job "ghost" {
     stagger = "30s"
     max_parallel = 2
   }
-  #test
+  
   namespace = "__NAMESPACE__"
 
   group "ghost" {
