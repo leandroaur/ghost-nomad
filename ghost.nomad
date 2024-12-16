@@ -93,7 +93,7 @@ job "ghost" {
       service {
         name = "ghost"
         port = "ghost"
-        tags = [ "urlprefix-__SITE_URL__/" ]
+        tags = [ "urlprefix-"__SITE_URL__"/" ]
 
         check {
           type     = "tcp"
