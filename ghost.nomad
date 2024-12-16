@@ -7,6 +7,8 @@ job "ghost" {
     max_parallel = 2
   }
 
+  namespace = prod
+
   group "ghost" {
 
     update {
