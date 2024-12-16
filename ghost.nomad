@@ -7,7 +7,7 @@ job "ghost" {
     max_parallel = 2
   }
 
-  namespace = "prod"
+  namespace = "__NAMESPACE__"
 
   group "ghost" {
 

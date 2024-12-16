@@ -30,6 +30,23 @@ jobs:
           docker tag $IMAGE_TAG leandroaurelio/ghost:latest
           docker push leandroaurelio/ghost:latest
 
+      - name: Replace Variables for Deploy
+        run: |
+          if [[ "${{ github.ref_name }}" == "bench" ]]; then
+            NAMESPACE="${{ secrets.BENCH_NAMESPACE }}"
+            SITE_URL="${{ secrets.BENCH_SITE_URL }}"
+          elif [[ "${{ github.ref_name }}" == "master" ]]; then
+            NAMESPACE="${{ secrets.PROD_NAMESPACE }}"
+            SITE_URL="${{ secrets.PROD_SITE_URL }}"
+          else
+            echo "Branch não reconhecida. Abortando."
+            exit 1
+          fi
+  
+          # Substituir os placeholders no arquivo ghost.nomad
+          sed -i "s|__NAMESPACE__|$NAMESPACE|g" ghost.nomad
+          sed -i "s|__SITE_URL__|$SITE_URL|g" ghost.nomad
+
       - name: Deploy nomad
         uses: rluisr/nomad-actions@master
 
@@ -38,7 +55,7 @@ jobs:
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
 
           # Substituir placeholders pelos secrets
-          sed -i "s|__SITE_URL__|${{ secrets.SITE_URL }}|g" ghost.nomad
+          
           sed -i "s|__USER_MAIL__|${{ secrets.USER_MAIL }}|g" ghost.nomad
           sed -i "s|__USER_PASSWORD__|${{ secrets.USER_PASSWORD }}|g" ghost.nomad
           sed -i "s|__MYSQL_ROOT_PASSWORD__|${{ secrets.MYSQL_ROOT_PASSWORD }}|g" ghost.nomad
