@@ -1,4 +1,4 @@
-job "ghost" {
+job "ghost-bench" {
   datacenters = ["dc1"]
   type = "service"
   
@@ -9,7 +9,7 @@ job "ghost" {
   
   namespace = "__NAMESPACE__"
 
-  group "ghost" {
+  group "ghost-bench" {
 
     update {
       canary = 1
@@ -24,13 +24,13 @@ job "ghost" {
       mode     = "delay"
     }
 
-    task "ghost" {
+    task "ghost-bench" {
       driver = "docker"
 
       config {
         image = "leandroaurelio/ghost:latest"
 
-        ports = ["ghost"]
+        ports = ["ghost-bench"]
         volumes = [
           "config/ghost-config.js:/var/lib/ghost/config.production.json",
           "local/ghost-content:/var/lib/ghost/content"
@@ -93,8 +93,8 @@ job "ghost" {
       }
 
       service {
-        name = "ghost"
-        port = "ghost"
+        name = "ghost-bench"
+        port = "ghost-bench"
         tags = [ "urlprefix-__SITE_URL__/" ]
 
         check {
@@ -106,7 +106,7 @@ job "ghost" {
     }
 
     network {
-      port "ghost" {
+      port "ghost-bench" {
         to = 2368
       }
     }
