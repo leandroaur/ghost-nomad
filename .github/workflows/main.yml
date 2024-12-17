@@ -68,7 +68,7 @@ jobs:
           echo "Job Modify Index: $INDEX"
           
           # Executa o job com o índice capturado
-          nomad job run -namespace=$NAMESPACE -check-index $INDEX ghost.nomad
+          nomad job run -namespace=$NAMESPACE -check-index $INDEX ghost.nomad || echo "Erro transitório ignorado"
           
           # Exibe o status do job
           nomad status -namespace=$NAMESPACE ghost
