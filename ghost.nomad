@@ -1,4 +1,4 @@
-job "ghost-prod" {
+job "ghost" {
   datacenters = ["dc1"]
   type = "service"
   
@@ -9,7 +9,7 @@ job "ghost-prod" {
   
   namespace = "__NAMESPACE__"
 
-  group "ghost-prod" {
+  group "ghost" {
 
     update {
       canary = 1
@@ -30,7 +30,7 @@ job "ghost-prod" {
       config {
         image = "leandroaurelio/ghost:latest"
 
-        ports = ["ghost-prod"]
+        ports = ["ghost"]
         volumes = [
           "config/ghost-config.js:/var/lib/ghost/config.production.json",
           "local/ghost-content:/var/lib/ghost/content"
@@ -93,8 +93,8 @@ job "ghost-prod" {
       }
 
       service {
-        name = "ghost-prod"
-        port = "ghost-prod"
+        name = "ghost"
+        port = "ghost"
         tags = [ "urlprefix-__SITE_URL__/" ]
 
         check {
@@ -106,7 +106,7 @@ job "ghost-prod" {
     }
 
     network {
-      port "ghost-prod" {
+      port "ghost" {
         to = 2368
       }
     }
