@@ -106,9 +106,7 @@ job "ghost-__NAMESPACE__" {
     }
 
     network {
-      port "ghost-__NAMESPACE__" {
-        to = 2368
-      }
+      port "ghost-__NAMESPACE__" {}
     }
   }
 
