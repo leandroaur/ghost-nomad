@@ -74,6 +74,6 @@ jobs:
           nomad job run -namespace=$NAMESPACE -check-index $INDEX ghost.nomad || echo "Erro transitório ignorado"
           
           # Exibe o status do job
-          nomad status -namespace=$NAMESPACE ghost
+          nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
         env:
           NOMAD_ADDR: "https://nomad.leandroaurelio.com"
