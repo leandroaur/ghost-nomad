@@ -73,6 +73,25 @@ jobs:
           # Executa o job com o índice capturado
           nomad job run -namespace=$NAMESPACE -check-index $INDEX ghost.nomad || echo "Erro transitório ignorado"
           
+          # Captura o Deployment ID do job
+          DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | grep "Latest Deployment" | awk '{print $NF}')
+          echo "Deployment ID: $DEPLOYMENT_ID"
+
+          # Aguarda a finalização do deployment
+          echo "Aguardando finalização do deploy..."
+          while true; do
+              STATUS=$(nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID | grep 'Status =' | awk '{print $3}')
+              echo "Status atual: $STATUS"
+              if [[ "$STATUS" == "successful" ]]; then
+                  echo "Deploy finalizado com sucesso!"
+                  break
+              elif [[ "$STATUS" == "failed" ]]; then
+                  echo "Erro no deploy!"
+                  exit 1
+              fi
+              sleep 10
+          done
+
           # Exibe o status do job
           nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
         env:
