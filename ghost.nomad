@@ -48,8 +48,8 @@ job "ghost-__NAMESPACE__" {
   "database": {
     "client": "mysql",
     "connection": {
-      "host": "{{- range service "db" }}{{ .Address }}{{- end }}",
-      "port": "{{- range service "db" }}{{ .Port }}{{- end }}",
+      "host": "{{- range service "db-__NAMESPACE__" }}{{ .Address }}{{- end }}",
+      "port": "{{- range service "db-__NAMESPACE__" }}{{ .Port }}{{- end }}",
       "user": "__MYSQL_USER__",
       "password": "__MYSQL_PASSWORD__",
       "database": "__MYSQL_DATABASE__"
@@ -107,12 +107,13 @@ job "ghost-__NAMESPACE__" {
 
     network {
       port "ghost-__NAMESPACE__" {
-        to = 2368
+        static = __PORT__
+        to     = 2368
       }
     }
   }
 
-  group "db" {
+  group "db-__NAMESPACE__" {
     count = 1
 
     update {
@@ -126,12 +127,12 @@ job "ghost-__NAMESPACE__" {
       mode     = "delay"
     }
 
-    task "db" {
+    task "db-__NAMESPACE__" {
       driver = "docker"
 
       config {
         image = "mysql:8.0"
-        ports = ["db"]
+        ports = ["db-__NAMESPACE__"]
         volumes = [
           "local/mysql-data:/var/lib/mysql"
         ]
@@ -150,8 +151,8 @@ job "ghost-__NAMESPACE__" {
       }
 
       service {
-        name = "db"
-        port = "db"
+        name = "db-__NAMESPACE__"
+        port = "db-__NAMESPACE__"
 
         check {
           type     = "tcp"
@@ -162,7 +163,7 @@ job "ghost-__NAMESPACE__" {
     }
 
     network {
-      port "db" {
+      port "db-__NAMESPACE__" {
         to = 3306
       }
     }
