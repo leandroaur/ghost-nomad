@@ -76,7 +76,14 @@ jobs:
           # Aguarda até o deployment ser criado
           echo "Aguardando deployment ser registrado..."
           DEPLOYMENT_ID=$(nomad deployment status -namespace=bench | grep ghost-bench | awk '{print $1}')
-          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
+          read -p "Deseja promover o deployment com ID $DEPLOYMENT_ID? (s/n): " resposta
+          if [[ "$resposta" == "s" ]]; then
+            nomad deployment promote -namespace=bench $DEPLOYMENT_ID
+            echo "Deployment promovido com sucesso!"
+          else
+            echo "Promoção cancelada pelo usuário."
+            exit 0
+          fi
 
           STATUS=$(nomad deployment status -namespace=bench $DEPLOYMENT_ID | grep -i Status | awk '{print $3}')
           while [ "$STATUS" != "successful" ]; do
