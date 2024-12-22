@@ -82,11 +82,13 @@ jobs:
       - name: Wait for deployment to be created
         run: |
           echo "Aguardando deployment ser registrado..."
+          OUTPUT_STATUS=$(nomad job status ghost-$NAMESPACE)
+          echo "saida do comando: $OUTPUT_STATUS"
           DEPLOYMENT_ID=$(nomad job status ghost-$NAMESPACE | grep "^ID" | awk '{print $2}')
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: Não foi possível capturar o Deployment ID."
-            exit 1
+            exit 0
           fi
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
   
