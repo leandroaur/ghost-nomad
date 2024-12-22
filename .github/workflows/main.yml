@@ -10,6 +10,8 @@ jobs:
   setup-nomad-pack:
     runs-on: ubuntu-latest
     name: Run Nomad Pack
+    env:
+      NOMAD_ADDR: "https://nomad.leandroaurelio.com"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -55,7 +57,7 @@ jobs:
 
       - name: Substitute placeholders with secrets
         run: |
-          export NOMAD_ADDR="https://nomad.leandroaurelio.com"
+          # export NOMAD_ADDR="https://nomad.leandroaurelio.com"
 
           # Substituir placeholders pelos secrets
           
