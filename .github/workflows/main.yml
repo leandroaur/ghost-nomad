@@ -82,9 +82,14 @@ jobs:
       - name: Wait for deployment to be created
         run: |
           echo "Aguardando deployment ser registrado..."
-          DEPLOYMENT_ID=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
+          DEPLOYMENT_ID=$(nomad job status ghost-$NAMESPACE | grep "^ID" | awk '{print $2}')
+          echo "Deployment ID capturado: $DEPLOYMENT_ID"
+          if [[ -z "$DEPLOYMENT_ID" ]]; then
+            echo "Erro: Não foi possível capturar o Deployment ID."
+            exit 1
+          fi
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
-
+  
       - name: Prompt for deployment promotion
         run: |
           echo "Deployment ID: ${{ env.DEPLOYMENT_ID }}"
