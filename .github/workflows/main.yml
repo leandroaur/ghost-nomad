@@ -75,42 +75,14 @@ jobs:
 
           # Aguarda até o deployment ser criado
           echo "Aguardando deployment ser registrado..."
-          DEPLOYMENT_ID=""
-          for i in {1..30}; do
-            DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | awk '/Deployment/ {gsub(/"/, "", $2); print $2}')
-            echo "Deployment ID: $DEPLOYMENT_ID"
-            if [[ -n "$DEPLOYMENT_ID" ]]; then
-              break
-            fi
-            echo "Tentativa $i: Deployment ID ainda não encontrado..."
+          DEPLOYMENT_ID=$(nomad deployment status -namespace=bench | grep ghost-bench | awk '{print $1}')
+          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
+
+          STATUS=$(nomad deployment status -namespace=bench $DEPLOYMENT_ID | grep -i Status | awk '{print $3}')
+          while [ "$STATUS" != "successful" ]; do
             sleep 5
-          done
-
-          if [[ -z "$DEPLOYMENT_ID" ]]; then
-            echo "Erro: Deployment ID não encontrado."
-            exit 1
-          fi
-          echo "Deployment ID: $DEPLOYMENT_ID"
-
-          # Aguarda a finalização do deployment
-          echo "Aguardando finalização do deploy..."
-          while true; do
-            STATUS=$(nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID | awk -F= '/Status/ {gsub(/ /, "", $2); print $2}')
-            echo "Status atual: $STATUS"
-
-            if [[ "$STATUS" == "successful" ]]; then
-              echo "Deploy finalizado com sucesso!"
-              break
-            elif [[ "$STATUS" == "failed" ]]; then
-              echo "Erro no deploy!"
-              exit 1
-            elif [[ -z "$STATUS" ]]; then
-              echo "Erro: Status do deploy não encontrado. Verifique manualmente."
-              exit 1
-           fi
-
-            sleep 10
-          done
+            STATUS=$(nomad deployment status -namespace=bench $DEPLOYMENT_ID | grep -i Status | awk '{print $3}')
+          done          
 
           # Exibe o status do job
           nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
