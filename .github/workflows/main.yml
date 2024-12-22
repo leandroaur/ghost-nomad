@@ -77,7 +77,8 @@ jobs:
           echo "Aguardando deployment ser registrado..."
           DEPLOYMENT_ID=""
           for i in {1..30}; do
-            DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | awk '/Deployment/ {print $NF}')
+            DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | awk '/Deployment/ {gsub(/"/, "", $2); print $2}')
+            echo "Deployment ID: $DEPLOYMENT_ID"
             if [[ -n "$DEPLOYMENT_ID" ]]; then
               break
             fi
