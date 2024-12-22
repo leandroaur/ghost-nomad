@@ -53,7 +53,7 @@ jobs:
       - name: Deploy nomad
         uses: rluisr/nomad-actions@master
 
-      - name: Deploy
+      - name: Substitute placeholders with secrets
         run: |
           export NOMAD_ADDR="https://nomad.leandroaurelio.com"
 
@@ -65,33 +65,46 @@ jobs:
           sed -i "s|__MYSQL_DATABASE__|${{ secrets.MYSQL_DATABASE }}|g" ghost.nomad
           sed -i "s|__MYSQL_USER__|${{ secrets.MYSQL_USER }}|g" ghost.nomad
           sed -i "s|__MYSQL_PASSWORD__|${{ secrets.MYSQL_PASSWORD }}|g" ghost.nomad
-          
+      
+      - name: Plan and get Job Modify Index
+        id: plan
+        run: |    
           # Planeja o job e captura o Job Modify Index
           INDEX=$(nomad job plan ghost.nomad | awk '/Job Modify Index/ {print $4}')
-          echo "Job Modify Index: $INDEX"
+          echo "INDEX=$INDEX" >> $GITHUB_ENV
 
-          # Executa o job com o índice capturado
-          nomad job run -namespace=$NAMESPACE -check-index $INDEX ghost.nomad || echo "Erro transitório ignorado"
+      - name: Deploy job
+        run: |
+          nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado"
 
-          # Aguarda até o deployment ser criado
+      - name: Wait for deployment to be created
+        run: |
           echo "Aguardando deployment ser registrado..."
-          DEPLOYMENT_ID=$(nomad deployment status -namespace=bench | grep ghost-bench | awk '{print $1}')
-          read -p "Deseja promover o deployment com ID $DEPLOYMENT_ID? (s/n): " resposta
+          DEPLOYMENT_ID=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
+          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+
+      - name: Prompt for deployment promotion
+        run: |
+          echo "Deployment ID: ${{ env.DEPLOYMENT_ID }}"
+          read -p "Deseja promover o deployment com ID ${{ env.DEPLOYMENT_ID }}? (s/n): " resposta
           if [[ "$resposta" == "s" ]]; then
-            nomad deployment promote -namespace=bench $DEPLOYMENT_ID
-            echo "Deployment promovido com sucesso!"
+            nomad deployment promote -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }}
           else
             echo "Promoção cancelada pelo usuário."
             exit 0
           fi
 
-          STATUS=$(nomad deployment status -namespace=bench $DEPLOYMENT_ID | grep -i Status | awk '{print $3}')
+      - name: Monitor deployment status
+        run: |
+          STATUS=$(nomad deployment status -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }} | grep -i Status | awk '{print $3}')
           while [ "$STATUS" != "successful" ]; do
             sleep 5
-            STATUS=$(nomad deployment status -namespace=bench $DEPLOYMENT_ID | grep -i Status | awk '{print $3}')
-          done          
+            STATUS=$(nomad deployment status -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }} | grep -i Status | awk '{print $3}')
+          done
+          echo "Deployment concluído com sucesso!"    
 
-          # Exibe o status do job
+      - name: Display job status
+        run: |
           nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
         env:
           NOMAD_ADDR: "https://nomad.leandroaurelio.com"
