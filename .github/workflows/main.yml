@@ -82,35 +82,50 @@ jobs:
       - name: Wait for deployment to be created
         run: |
           echo "Aguardando deployment ser registrado..."
-          DEPLOYMENT_IDS=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
-          echo "Deployment IDs capturados: $DEPLOYMENT_IDS"
-          COMMAND=$(nomad deployment status -namespace=$NAMESPACE)
-          echo "output nomad deployment status: $COMMAND"
-  
-          # Inicializa a variável como vazia
+            
+          MAX_RETRIES=10
+          RETRY_DELAY=10
+          ATTEMPTS=0
           DEPLOYMENT_ID=""
+  
+          while [[ $ATTEMPTS -lt $MAX_RETRIES ]]; do
+            echo "Tentativa $((ATTEMPTS + 1)) de $MAX_RETRIES..."
+              
+            # Captura os IDs dos deployments
+            DEPLOYMENT_IDS=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
+            echo "Deployment IDs capturados: $DEPLOYMENT_IDS"
 
-          # Itera pelos IDs e verifica o status
-          for ID in $DEPLOYMENT_IDS; do
-            STATUS=$(nomad deployment status -namespace=$NAMESPACE $ID | grep "^Status" | awk '{print $2}')
-            echo "ID: $ID | Status: $STATUS"
-            if [[ "$STATUS" == "running" ]]; then
-              DEPLOYMENT_ID=$ID
+            COMMAND=$(nomad deployment status -namespace=$NAMESPACE)
+            echo "output nomad deployment status: $COMMAND"
+  
+            # Verifica se capturou algum ID
+            if [[ -n "$DEPLOYMENT_IDS" ]]; then
+              for ID in $DEPLOYMENT_IDS; do
+                STATUS=$(nomad deployment status -namespace=$NAMESPACE $ID | grep "^Status" | awk '{print $2}')
+                echo "ID: $ID | Status: $STATUS"
+                if [[ "$STATUS" == "running" ]]; then
+                  DEPLOYMENT_ID=$ID
+                  break
+                fi
+              done
+            fi
+  
+            # Para o loop se um deployment válido for encontrado
+            if [[ -n "$DEPLOYMENT_ID" ]]; then
               break
             fi
+
+            echo "Nenhum deployment válido encontrado. Tentando novamente em $RETRY_DELAY segundos..."
+            ATTEMPTS=$((ATTEMPTS + 1))
+            sleep $RETRY_DELAY
           done
   
-          # Se não encontrar um ID em 'running', usa outro
           if [[ -z "$DEPLOYMENT_ID" ]]; then
-            echo "Nenhum deployment em 'running' encontrado. Usando o primeiro ID capturado."
-            DEPLOYMENT_ID=$(echo $DEPLOYMENT_IDS | awk '{print $1}')
+            echo "Erro: Não foi possível capturar o Deployment ID após $MAX_RETRIES tentativas."
+            exit 1
           fi
   
           echo "Deployment ID final: $DEPLOYMENT_ID"
-          if [[ -z "$DEPLOYMENT_ID" ]]; then
-            echo "Erro: Não foi possível capturar o Deployment ID."
-            exit 1
-          fi
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
   
       - name: Prompt for deployment promotion
