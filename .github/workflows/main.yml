@@ -80,21 +80,24 @@ jobs:
           echo "INDEX=$INDEX" >> $GITHUB_ENV
 
       - name: Deploy job and capture Deployment ID
-        id: deploy
         run: |
           echo "Iniciando o deploy..."
-          OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad)
+            
+          # Executa o deploy e captura a saída
+          OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado")
           echo "Saída do comando: $OUTPUT"
-  
-          # Capturar o Deployment ID
-          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Monitoring deployment ")[^"]+')
+
+          # Captura o Deployment ID mesmo com o erro 504 na saída
+          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Deployment ID: )[^\s]+')
+            
           if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: Não foi possível capturar o Deployment ID."
             exit 1
           fi
-
+  
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+  
 
       - name: Monitor deployment status
         run: |
