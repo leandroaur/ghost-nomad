@@ -82,10 +82,29 @@ jobs:
       - name: Wait for deployment to be created
         run: |
           echo "Aguardando deployment ser registrado..."
-          OUTPUT_STATUS=$(nomad deployment status -namespace=ghost-$NAMESPACE)
-          echo "saida do comando: $OUTPUT_STATUS"
-          DEPLOYMENT_ID=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
-          echo "Deployment ID capturado: $DEPLOYMENT_ID"
+          DEPLOYMENT_IDS=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
+          echo "Deployment IDs capturados: $DEPLOYMENT_IDS"
+  
+          # Inicializa a variável como vazia
+          DEPLOYMENT_ID=""
+
+          # Itera pelos IDs e verifica o status
+          for ID in $DEPLOYMENT_IDS; do
+            STATUS=$(nomad deployment status -namespace=$NAMESPACE $ID | grep "^Status" | awk '{print $2}')
+            echo "ID: $ID | Status: $STATUS"
+            if [[ "$STATUS" == "running" ]]; then
+              DEPLOYMENT_ID=$ID
+              break
+            fi
+          done
+  
+          # Se não encontrar um ID em 'running', usa outro
+          if [[ -z "$DEPLOYMENT_ID" ]]; then
+            echo "Nenhum deployment em 'running' encontrado. Usando o primeiro ID capturado."
+            DEPLOYMENT_ID=$(echo $DEPLOYMENT_IDS | awk '{print $1}')
+          fi
+  
+          echo "Deployment ID final: $DEPLOYMENT_ID"
           if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: Não foi possível capturar o Deployment ID."
             exit 1
