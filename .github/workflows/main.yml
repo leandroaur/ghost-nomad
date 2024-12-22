@@ -84,6 +84,8 @@ jobs:
           echo "Aguardando deployment ser registrado..."
           DEPLOYMENT_IDS=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
           echo "Deployment IDs capturados: $DEPLOYMENT_IDS"
+          COMMAND=$(nomad deployment status -namespace=$NAMESPACE)
+          echo "output nomad deployment status: $COMMAND"
   
           # Inicializa a variável como vazia
           DEPLOYMENT_ID=""
