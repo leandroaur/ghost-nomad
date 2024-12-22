@@ -85,12 +85,14 @@ jobs:
           echo "Iniciando o deploy..."
           OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad)
           echo "Saída do comando: $OUTPUT"
-
-          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP 'Deployment ID: \K[\w-]+')
+  
+          # Capturar o Deployment ID
+          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Monitoring deployment ")[^"]+')
           if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: Não foi possível capturar o Deployment ID."
             exit 1
           fi
+
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
 
