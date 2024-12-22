@@ -76,7 +76,7 @@ jobs:
           # Aguarda até o deployment ser criado
           echo "Aguardando deployment ser registrado..."
           DEPLOYMENT_ID=""
-          for i in {1..10}; do
+          for i in {1..30}; do
             DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | awk '/Deployment/ {print $NF}')
             if [[ -n "$DEPLOYMENT_ID" ]]; then
               break
