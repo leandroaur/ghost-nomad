@@ -52,101 +52,40 @@ jobs:
           sed -i "s|__SITE_URL__|$SITE_URL|g" ghost.nomad
           sed -i "s|__PORT__|$PORT|g" ghost.nomad
 
-      - name: Deploy nomad
-        uses: rluisr/nomad-actions@master
-
       - name: Substitute placeholders with secrets
         run: |
-          # export NOMAD_ADDR="https://nomad.leandroaurelio.com"
-
-          # Substituir placeholders pelos secrets
-          
           sed -i "s|__USER_MAIL__|${{ secrets.USER_MAIL }}|g" ghost.nomad
           sed -i "s|__USER_PASSWORD__|${{ secrets.USER_PASSWORD }}|g" ghost.nomad
           sed -i "s|__MYSQL_ROOT_PASSWORD__|${{ secrets.MYSQL_ROOT_PASSWORD }}|g" ghost.nomad
           sed -i "s|__MYSQL_DATABASE__|${{ secrets.MYSQL_DATABASE }}|g" ghost.nomad
           sed -i "s|__MYSQL_USER__|${{ secrets.MYSQL_USER }}|g" ghost.nomad
           sed -i "s|__MYSQL_PASSWORD__|${{ secrets.MYSQL_PASSWORD }}|g" ghost.nomad
-      
-      - name: Plan and get Job Modify Index
-        id: plan
-        run: |    
-          # Planeja o job e captura o Job Modify Index
-          INDEX=$(nomad job plan ghost.nomad | awk '/Job Modify Index/ {print $4}')
-          echo "INDEX=$INDEX" >> $GITHUB_ENV
 
-      - name: Deploy job
+      - name: Deploy job and capture Deployment ID
+        id: deploy
         run: |
-          nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado"
+          echo "Iniciando o deploy..."
+          OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ghost.nomad)
+          echo "Saída do comando: $OUTPUT"
 
-      - name: Wait for deployment to be created
-        run: |
-          echo "Aguardando deployment ser registrado..."
-            
-          MAX_RETRIES=10
-          RETRY_DELAY=10
-          ATTEMPTS=0
-          DEPLOYMENT_ID=""
-  
-          while [[ $ATTEMPTS -lt $MAX_RETRIES ]]; do
-            echo "Tentativa $((ATTEMPTS + 1)) de $MAX_RETRIES..."
-              
-            # Captura os IDs dos deployments
-            DEPLOYMENT_IDS=$(nomad deployment status -namespace=$NAMESPACE | grep ghost-$NAMESPACE | awk '{print $1}')
-            echo "Deployment IDs capturados: $DEPLOYMENT_IDS"
-
-            COMMAND=$(nomad deployment status -namespace=$NAMESPACE)
-            echo "output nomad deployment status: $COMMAND"
-  
-            # Verifica se capturou algum ID
-            if [[ -n "$DEPLOYMENT_IDS" ]]; then
-              for ID in $DEPLOYMENT_IDS; do
-                STATUS=$(nomad deployment status -namespace=$NAMESPACE $ID | grep "^Status" | awk '{print $2}')
-                echo "ID: $ID | Status: $STATUS"
-                if [[ "$STATUS" == "running" ]]; then
-                  DEPLOYMENT_ID=$ID
-                  break
-                fi
-              done
-            fi
-  
-            # Para o loop se um deployment válido for encontrado
-            if [[ -n "$DEPLOYMENT_ID" ]]; then
-              break
-            fi
-
-            echo "Nenhum deployment válido encontrado. Tentando novamente em $RETRY_DELAY segundos..."
-            ATTEMPTS=$((ATTEMPTS + 1))
-            sleep $RETRY_DELAY
-          done
-  
+          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP 'Deployment ID: \K[\w-]+')
           if [[ -z "$DEPLOYMENT_ID" ]]; then
-            echo "Erro: Não foi possível capturar o Deployment ID após $MAX_RETRIES tentativas."
+            echo "Erro: Não foi possível capturar o Deployment ID."
             exit 1
           fi
-  
-          echo "Deployment ID final: $DEPLOYMENT_ID"
+
+          echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
-  
-      - name: Prompt for deployment promotion
-        run: |
-          echo "Deployment ID: ${{ env.DEPLOYMENT_ID }}"
-          read -p "Deseja promover o deployment com ID ${{ env.DEPLOYMENT_ID }}? (s/n): " resposta
-          if [[ "$resposta" == "s" ]]; then
-            nomad deployment promote -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }}
-          else
-            echo "Promoção cancelada pelo usuário."
-            exit 0
-          fi
 
       - name: Monitor deployment status
         run: |
           STATUS=$(nomad deployment status -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }} | grep -i Status | awk '{print $3}')
           while [ "$STATUS" != "successful" ]; do
+            echo "Aguardando o deployment ser concluído... Status atual: $STATUS"
             sleep 5
             STATUS=$(nomad deployment status -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }} | grep -i Status | awk '{print $3}')
           done
-          echo "Deployment concluído com sucesso!"    
+          echo "Deployment concluído com sucesso!"
 
       - name: Display job status
         run: |
