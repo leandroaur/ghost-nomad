@@ -73,36 +73,45 @@ jobs:
           # Executa o job com o índice capturado
           nomad job run -namespace=$NAMESPACE -check-index $INDEX ghost.nomad || echo "Erro transitório ignorado"
 
-          # Captura o Deployment ID do job
-          DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | awk '/Deployment/ {print $NF}')
+          # Aguarda até o deployment ser criado
+          echo "Aguardando deployment ser registrado..."
+          DEPLOYMENT_ID=""
+          for i in {1..10}; do
+            DEPLOYMENT_ID=$(nomad job status -namespace=$NAMESPACE ghost-$NAMESPACE | awk '/Deployment/ {print $NF}')
+            if [[ -n "$DEPLOYMENT_ID" ]]; then
+              break
+            fi
+            echo "Tentativa $i: Deployment ID ainda não encontrado..."
+            sleep 5
+          done
+
           if [[ -z "$DEPLOYMENT_ID" ]]; then
-              echo "Erro: Deployment ID não encontrado."
-              exit 1
+            echo "Erro: Deployment ID não encontrado."
+            exit 1
           fi
           echo "Deployment ID: $DEPLOYMENT_ID"
 
           # Aguarda a finalização do deployment
           echo "Aguardando finalização do deploy..."
           while true; do
-              STATUS=$(nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID | awk -F= '/Status/ {gsub(/ /, "", $2); print $2}')
-              echo "Status atual: $STATUS"
+            STATUS=$(nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID | awk -F= '/Status/ {gsub(/ /, "", $2); print $2}')
+            echo "Status atual: $STATUS"
 
-              if [[ "$STATUS" == "successful" ]]; then
-                  echo "Deploy finalizado com sucesso!"
-                  break
-              elif [[ "$STATUS" == "failed" ]]; then
-                  echo "Erro no deploy!"
-                  exit 1
-              elif [[ -z "$STATUS" ]]; then
-                  echo "Erro: Status do deploy não encontrado. Verifique manualmente."
-                  exit 1
-              fi
+            if [[ "$STATUS" == "successful" ]]; then
+              echo "Deploy finalizado com sucesso!"
+              break
+            elif [[ "$STATUS" == "failed" ]]; then
+              echo "Erro no deploy!"
+              exit 1
+            elif [[ -z "$STATUS" ]]; then
+              echo "Erro: Status do deploy não encontrado. Verifique manualmente."
+              exit 1
+           fi
 
-              sleep 10
+            sleep 10
           done
 
-            # Exibe o status do job
-            nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
-
+          # Exibe o status do job
+          nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
         env:
           NOMAD_ADDR: "https://nomad.leandroaurelio.com"
