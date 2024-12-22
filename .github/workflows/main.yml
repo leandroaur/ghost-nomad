@@ -87,8 +87,8 @@ jobs:
           OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado")
           echo "Saída do comando: $OUTPUT"
 
-          # Captura o Deployment ID mesmo com o erro 504 na saída
-          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Deployment ID: )[^\s]+')
+          # Captura o Deployment ID, verificando tanto sucesso quanto falhas transitórias
+          DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Monitoring deployment ")[^"]+')
             
           if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: Não foi possível capturar o Deployment ID."
