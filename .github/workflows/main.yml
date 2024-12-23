@@ -107,11 +107,13 @@ jobs:
           ELAPSED=0
           while true; do
             STATUS=$(nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID 2>/dev/null | grep -i 'Status' | awk '{print $3}')
+            COMMAND_OUT=$(nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID)
             if [[ "$STATUS" == "successful" ]]; then
               echo "Deployment concluído com sucesso!"
               break
               elif [[ "$STATUS" == "" ]]; then
               echo "Aviso: Não foi possível capturar o status do deployment. Tentando novamente..."
+              echo "Saída do comando: $COMMAND_OUT"
             else
               echo "Aguardando o deployment ser concluído... Status atual: $STATUS"
             fi
