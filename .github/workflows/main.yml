@@ -97,11 +97,14 @@ jobs:
   
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+          
+          echo "Aguardando o registro do deployment..."
+          sleep 5
   
 
       - name: Monitor deployment status
         run: |
-          echo "Verificando status do deployment ID: $DEPLOYMENT_ID"
+          echo "Verificando status do deployment ID: $DEPLOYMENT_ID ou ${{ env.DEPLOYMENT_ID }}"
           TIMEOUT=300
           INTERVAL=5
           ELAPSED=0
