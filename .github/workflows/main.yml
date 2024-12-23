@@ -111,7 +111,7 @@ jobs:
           while true; do
             echo "Saída completa do comando 'nomad deployment status':"
             nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID || echo "Erro ao executar o comando."
-            STATUS=$(bash -c "nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID 2>/dev/null | grep -i 'Status' | awk '{print $3}'")
+            STATUS=$(bash -c "nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID -t {{ .Status }}")
             if [[ "$STATUS" == "successful" ]]; then
               echo "Deployment concluído com sucesso!"
               break
