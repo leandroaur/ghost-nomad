@@ -19,7 +19,7 @@ jobs:
       - name: Install Nomad CLI
         run: |
           echo "Instalando Nomad CLI..."
-          curl -fsSL https://releases.hashicorp.com/nomad/1.6.0/nomad_1.6.0_linux_amd64.zip -o nomad.zip
+          curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
           unzip nomad.zip
           sudo mv nomad /usr/local/bin/
           nomad --version
