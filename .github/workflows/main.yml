@@ -110,8 +110,8 @@ jobs:
           ELAPSED=0
           while true; do
             echo "Saída completa do comando 'nomad deployment status':"
-            nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID || echo "Erro ao executar o comando."
-            STATUS=$(bash -c "nomad deployment status -namespace=$NAMESPACE $DEPLOYMENT_ID -t {{ .Status }}")
+            nomad deployment status -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }} || echo "Erro ao executar o comando."
+            STATUS=$(bash -c "nomad job inspect -t '{{range .}}{{if eq .Name "ghost-$NAMESPACE"}}{{ println .Status}}{{end}}{{end}}' -namespace=$NAMESPACE")
             if [[ "$STATUS" == "successful" ]]; then
               echo "Deployment concluído com sucesso!"
               break
