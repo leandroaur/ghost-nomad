@@ -100,6 +100,30 @@ jobs:
           
           echo "Aguardando o registro do deployment..."
           sleep 60
-  
+
+  approve:
+    runs-on: ubuntu-latest
+    name: Promover deployment
+    needs: [setup-nomad-pack]
+    env:
+      NOMAD_ADDR: "https://nomad.leandroaurelio.com"
+    steps:
+      - name: Instalar Nomad CLI
+        run: |
+          curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
+          unzip nomad.zip
+          sudo mv nomad /usr/local/bin/
+
+      - name: Promover Deployment
+        run: |
+          echo "Iniciando promoção do deployment..."
+          
+          if [[ -z "${{ github.event.workflow_run.outputs.DEPLOYMENT_ID }}" ]]; then
+            echo "Erro: DEPLOYMENT_ID não foi passado da primeira pipeline."
+            exit 1
+          fi
+          
+          nomad deployment promote -namespace=$NAMESPACE ${{ github.event.workflow_run.outputs.DEPLOYMENT_ID }}
+          echo "Deployment promovido com sucesso!"
 
 
