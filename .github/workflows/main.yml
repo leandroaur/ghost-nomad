@@ -102,36 +102,4 @@ jobs:
           sleep 60
   
 
-      - name: Monitor deployment status
-        run: |
-          echo "Verificando status do deployment ID: $DEPLOYMENT_ID ou ${{ env.DEPLOYMENT_ID }}"
-          TIMEOUT=300
-          INTERVAL=5
-          ELAPSED=0
-          while true; do
-            echo "Saída completa do comando 'nomad deployment status':"
-            nomad deployment status -namespace=$NAMESPACE ${{ env.DEPLOYMENT_ID }} || echo "Erro ao executar o comando."
-            STATUS=$(bash -c "nomad job inspect -t '{{range .}}{{if eq .Name "ghost-$NAMESPACE"}}{{ println .Status}}{{end}}{{end}}' -namespace=$NAMESPACE")
-            if [[ "$STATUS" == "successful" ]]; then
-              echo "Deployment concluído com sucesso!"
-              break
-              elif [[ "$STATUS" == "" ]]; then
-              echo "Aviso: Não foi possível capturar o status do deployment. Tentando novamente..."
-            else
-              echo "Aguardando o deployment ser concluído... Status atual: $STATUS"
-            fi
 
-            # Incrementar o tempo decorrido
-            sleep $INTERVAL
-            ELAPSED=$((ELAPSED + INTERVAL))
-
-            # Verificar se o timeout foi alcançado
-            if (( ELAPSED >= TIMEOUT )); then
-              echo "Erro: Tempo limite de $TIMEOUT segundos atingido. Deployment não foi concluído."
-              exit 1
-            fi
-          done
-
-      - name: Display job status
-        run: |
-          nomad status -namespace=$NAMESPACE ghost-$NAMESPACE
