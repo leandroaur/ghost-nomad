@@ -1,33 +1,36 @@
+name: Promover Deployment com Nomad
+
 on:
-    workflow_run:
-      workflows: ["Deploy com Nomad"]
-      types:
-        - completed
-  
-  env:
-    NOMAD_ADDR: https://nomad.leandroaurelio.com
-    NAMESPACE: bench
-  
-  jobs:
-    promote:
-      runs-on: ubuntu-latest
-  
-      steps:
-        - name: Instalar Nomad CLI
-          run: |
-            curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
-            unzip nomad.zip
-            sudo mv nomad /usr/local/bin/
-  
-        - name: Promover Deployment
-          run: |
-            echo "Iniciando a promoção do deployment..."
-            DEPLOYMENT_ID=$(cat $GITHUB_ENV | grep DEPLOYMENT_ID | cut -d'=' -f2)
-  
-            if [[ -z "$DEPLOYMENT_ID" ]]; then
-              echo "Erro: Deployment ID não encontrado."
-              exit 1
-            fi
-  
-            nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
-            echo "Deployment promovido com sucesso!"
+  workflow_run:
+    workflows:
+      - "Deploy com Nomad"
+    types:
+      - completed
+
+env:
+  NOMAD_ADDR: https://nomad.leandroaurelio.com
+  NAMESPACE: bench
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instalar Nomad CLI
+        run: |
+          curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
+          unzip nomad.zip
+          sudo mv nomad /usr/local/bin/
+
+      - name: Promover Deployment
+        run: |
+          echo "Iniciando a promoção do deployment..."
+          DEPLOYMENT_ID=$(cat $GITHUB_ENV | grep DEPLOYMENT_ID | cut -d'=' -f2)
+
+          if [[ -z "$DEPLOYMENT_ID" ]]; then
+            echo "Erro: Deployment ID não encontrado."
+            exit 1
+          fi
+
+          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
+          echo "Deployment promovido com sucesso!"
