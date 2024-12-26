@@ -11,7 +11,7 @@ Nomad, Consul, and Fabio are powerful tools for managing workloads, configuring 
 1. **Download Nomad** from the official website or use a package manager (e.g., `apt` or `yum`).
 2. **Configure the Nomad agent**:
    - Create the `nomad.hcl` file with basic configurations.
-   - Use the command `nomad agent -dev` for testing.
+   - Use the command `nomad agent -dev` for testing for example.
 
 ## Step 2: Installing Consul
 
