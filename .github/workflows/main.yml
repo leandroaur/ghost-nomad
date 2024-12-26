@@ -97,10 +97,13 @@ jobs:
   
       - name: Save Deployment ID to file
         run: |
+          echo "Deployment ID capturado: $DEPLOYMENT_ID"
+          echo "Registrando o Deployment id em $GITHUB_WORKSPACE/deployment_id.txt"
           echo "$DEPLOYMENT_ID" > $GITHUB_WORKSPACE/deployment_id.txt
-          
-          echo "Aguardando o registro do deployment..."
-          sleep 10
+          OUTPUT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
+          echo "Arquivo final $OUTPUT_ID"
+          echo "Fim"
+  
 
   approve:
     runs-on: ubuntu-latest
