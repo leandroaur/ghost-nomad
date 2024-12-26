@@ -95,8 +95,9 @@ jobs:
             exit 1
           fi
   
-          echo "Deployment ID capturado: $DEPLOYMENT_ID"
-          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+      - name: Save Deployment ID to file
+        run: |
+          echo "$DEPLOYMENT_ID" > $GITHUB_WORKSPACE/deployment_id.txt
           
           echo "Aguardando o registro do deployment..."
           sleep 10
@@ -120,9 +121,10 @@ jobs:
           echo "printenv"
           echo "Iniciando promoção do deployment..."
 
-          echo "Deployment ID: ${{ env.DEPLOYMENT_ID }}"
+          DEPLOYMENT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
+          echo "Deployment ID: $DEPLOYMENT_ID"
           
-          if [[ -z "${{ env.DEPLOYMENT_ID }}" ]]; then
+          if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: DEPLOYMENT_ID não foi passado do job anterior."
             exit 1
           fi
