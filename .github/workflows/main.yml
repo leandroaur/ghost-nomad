@@ -95,8 +95,6 @@ jobs:
             exit 1
           fi
   
-      - name: Save Deployment ID to file
-        run: |
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "Registrando o Deployment id em $GITHUB_WORKSPACE/deployment_id.txt"
           echo "$DEPLOYMENT_ID" > $GITHUB_WORKSPACE/deployment_id.txt
