@@ -160,12 +160,6 @@ jobs:
             echo "Branch não reconhecida. Abortando."
             exit 1
           fi
-
-      - name: Aprovação Manual
-        uses: trstringer/manual-approval@v1
-        with:
-          message: "Aprovar para promover o deployment?"
-          approvers: leandroaur
   
       - name: Promover Deployment
         run: |
