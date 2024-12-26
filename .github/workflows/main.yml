@@ -162,9 +162,10 @@ jobs:
           fi
 
       - name: Aprovação Manual
-        uses: fjogeleit/manual-approval-action@v2
+        uses: trstringer/manual-approval@v1
         with:
           message: "Aprovar para promover o deployment?"
+          approvers: leandroaur
   
       - name: Promover Deployment
         run: |
