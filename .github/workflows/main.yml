@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Nomad Pack
     env:
-      NOMAD_ADDR: "https://"https://${{ secrets.NOMAD_SERVER }}""
+      NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
