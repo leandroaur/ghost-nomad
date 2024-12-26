@@ -101,6 +101,8 @@ jobs:
           OUTPUT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
           echo "Arquivo final $OUTPUT_ID"
           echo "Fim"
+
+          nomad deployment promote -namespace=$NAMESPACE $OUTPUT_ID
   
 
   approve:
@@ -122,7 +124,7 @@ jobs:
           echo "printenv"
           echo "Iniciando promoção do deployment..."
 
-          DEPLOYMENT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
+          DEPLOYMENT_ID2=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
           echo "Deployment ID: $DEPLOYMENT_ID"
           
           if [[ -z "$DEPLOYMENT_ID" ]]; then
