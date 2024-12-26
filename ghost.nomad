@@ -30,8 +30,9 @@ job "ghost-__NAMESPACE__" {
       config {
         image = "leandroaurelio/ghost:latest"
 
-        ports = ["ghost-__NAMESPACE__"] 
-        volumes = [
+        ports        = ["ghost-__NAMESPACE__"]
+        network_mode = "bridge"
+        volumes      = [
           "config/ghost-config.js:/var/lib/ghost/config.production.json",
           "local/ghost-content:/var/lib/ghost/content"
         ]

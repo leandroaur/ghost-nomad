@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Nomad Pack
     env:
-      NOMAD_ADDR: "https://nomad.leandroaurelio.com"
+      NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -96,10 +96,68 @@ jobs:
           fi
   
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
-          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
-          
-          echo "Aguardando o registro do deployment..."
-          sleep 60
-  
+          echo "Registrando o Deployment id em $GITHUB_WORKSPACE/deployment_id.txt"
+          echo "$DEPLOYMENT_ID" > $GITHUB_WORKSPACE/deployment_id.txt
+          echo "$DEPLOYMENT_ID" > deployment_id.txt
+          OUTPUT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
+          echo "Arquivo final $OUTPUT_ID"
+          echo "Fim"
+
+      - name: Upload deployment_id artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-id
+          path: deployment_id.txt
+
+      - name: Upload Deployment ID as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-id
+          path: deployment_id.txt
+
+      - name: Download Deployment ID artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-id
+
+      - name: Show Deployment ID
+        run: cat deployment_id.txt
 
 
+  approve:
+    runs-on: ubuntu-latest
+    name: Promover deployment
+    needs: [setup-nomad-pack]
+    env:
+      NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
+
+    steps:
+      - name: Instalar Nomad CLI
+        run: |
+          curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
+          unzip nomad.zip
+          sudo mv nomad /usr/local/bin/
+
+      - name: Download deployment_id artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-id
+
+      - name: Read Deployment ID from artifact and Promote
+        run: |
+          DEPLOYMENT_ID2=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
+          echo "Deployment ID: $DEPLOYMENT_ID2"
+
+          if [[ "${{ github.ref_name }}" == "bench" ]]; then
+            NAMESPACE="${{ secrets.BENCH_NAMESPACE }}"
+            SITE_URL="${{ secrets.BENCH_SITE_URL }}"
+            PORT="${{ secrets.BENCH_PORT }}"
+          elif [[ "${{ github.ref_name }}" == "master" ]]; then
+            NAMESPACE="${{ secrets.PROD_NAMESPACE }}"
+            SITE_URL="${{ secrets.PROD_SITE_URL }}"
+            PORT="${{ secrets.PROD_PORT }}"
+          else
+            echo "Branch não reconhecida. Abortando."
+            exit 1
+          fi
+          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
