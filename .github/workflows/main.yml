@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Nomad Pack
     env:
-      NOMAD_ADDR: "https://nomad.leandroaurelio.com"
+      NOMAD_ADDR: "https://"https://${{ secrets.NOMAD_SERVER }}""
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -97,7 +97,6 @@ jobs:
   
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "::set-output name=DEPLOYMENT_ID::$DEPLOYMENT_ID"
-          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
           
           echo "Aguardando o registro do deployment..."
           sleep 30
@@ -107,7 +106,7 @@ jobs:
     name: Promover deployment
     needs: [setup-nomad-pack]
     env:
-      NOMAD_ADDR: "https://nomad.leandroaurelio.com"
+      NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
     steps:
       - name: Instalar Nomad CLI
         run: |
@@ -119,7 +118,7 @@ jobs:
         run: |
           echo "Iniciando promoção do deployment..."
 
-          DEPLOYMENT_ID=${{ needs.setup-nomad-pack.outputs.DEPLOYMENT_ID }}
+          DEPLOYMENT_ID=${{ needs.setup-nomad-pack.outputs.deployment_id }}
           echo "DEPLOYMENT_ID: $DEPLOYMENT_ID"
           
           if [[ -z "$DEPLOYMENT_ID" ]]; then
