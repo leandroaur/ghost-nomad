@@ -99,7 +99,7 @@ jobs:
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
           
           echo "Aguardando o registro do deployment..."
-          sleep 60
+          sleep 30
 
   approve:
     runs-on: ubuntu-latest
@@ -118,12 +118,12 @@ jobs:
         run: |
           echo "Iniciando promoção do deployment..."
           
-          if [[ -z "${{ github.event.workflow_run.outputs.DEPLOYMENT_ID }}" ]]; then
-            echo "Erro: DEPLOYMENT_ID não foi passado da primeira pipeline."
+          if [[ -z "${{ needs.setup-nomad-pack.outputs.DEPLOYMENT_ID }}" ]]; then
+            echo "Erro: DEPLOYMENT_ID não foi passado do job anterior."
             exit 1
           fi
           
-          nomad deployment promote -namespace=$NAMESPACE ${{ github.event.workflow_run.outputs.DEPLOYMENT_ID }}
+          nomad deployment promote -namespace=$NAMESPACE ${{ needs.setup-nomad-pack.outputs.DEPLOYMENT_ID }}
           echo "Deployment promovido com sucesso!"
 
 
