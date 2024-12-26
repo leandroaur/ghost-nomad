@@ -96,6 +96,7 @@ jobs:
           fi
   
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
+          echo "::set-output name=DEPLOYMENT_ID::$DEPLOYMENT_ID"
           echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
           
           echo "Aguardando o registro do deployment..."
@@ -117,13 +118,30 @@ jobs:
       - name: Promover Deployment
         run: |
           echo "Iniciando promoção do deployment..."
+
+          DEPLOYMENT_ID=${{ needs.setup-nomad-pack.outputs.DEPLOYMENT_ID }}
+          echo "DEPLOYMENT_ID: $DEPLOYMENT_ID"
           
-          if [[ -z "${{ needs.setup-nomad-pack.outputs.DEPLOYMENT_ID }}" ]]; then
+          if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: DEPLOYMENT_ID não foi passado do job anterior."
             exit 1
           fi
-          
-          nomad deployment promote -namespace=$NAMESPACE ${{ needs.setup-nomad-pack.outputs.DEPLOYMENT_ID }}
+
+      - name: Replace Variables for Deploy and promote job
+        run: |
+          if [[ "${{ github.ref_name }}" == "bench" ]]; then
+            NAMESPACE="${{ secrets.BENCH_NAMESPACE }}"
+            SITE_URL="${{ secrets.BENCH_SITE_URL }}"
+            PORT="${{ secrets.BENCH_PORT }}"
+          elif [[ "${{ github.ref_name }}" == "master" ]]; then
+            NAMESPACE="${{ secrets.PROD_NAMESPACE }}"
+            SITE_URL="${{ secrets.PROD_SITE_URL }}"
+            PORT="${{ secrets.PROD_PORT }}"
+          else
+            echo "Branch não reconhecida. Abortando."
+            exit 1
+          fi
+          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
           echo "Deployment promovido com sucesso!"
 
 
