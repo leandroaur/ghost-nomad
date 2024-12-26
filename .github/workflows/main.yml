@@ -160,8 +160,4 @@ jobs:
             echo "Branch não reconhecida. Abortando."
             exit 1
           fi
-  
-      - name: Promover Deployment
-        run: |
           nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
-
