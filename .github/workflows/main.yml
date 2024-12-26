@@ -102,7 +102,12 @@ jobs:
           echo "Arquivo final $OUTPUT_ID"
           echo "Fim"
 
-  
+      - name: Upload deployment_id artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-id
+          path: $GITHUB_WORKSPACE/deployment_id.txt
+
 
   approve:
     runs-on: ubuntu-latest
@@ -118,34 +123,25 @@ jobs:
           unzip nomad.zip
           sudo mv nomad /usr/local/bin/
 
+      - name: Download deployment_id artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-id
+
+      - name: Read Deployment ID from artifact
+        run: |
+          DEPLOYMENT_ID2=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
+          echo "Deployment ID: $DEPLOYMENT_ID2"
+
       - name: Promover Deployment
         run: |
-          echo "printenv"
           echo "Iniciando promoção do deployment..."
 
-          DEPLOYMENT_ID2=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
-          echo "Deployment ID: $DEPLOYMENT_ID"
-          
-          if [[ -z "$DEPLOYMENT_ID" ]]; then
-            echo "Erro: arquivo $DEPLOYMENT_ID não encontrado"
+          if [[ -z "$DEPLOYMENT_ID2" ]]; then
+            echo "Erro: arquivo $DEPLOYMENT_ID2 não encontrado"
             exit 1
           fi
 
-      - name: Replace Variables for Deploy and promote job
-        run: |
-          if [[ "${{ github.ref_name }}" == "bench" ]]; then
-            NAMESPACE="${{ secrets.BENCH_NAMESPACE }}"
-            SITE_URL="${{ secrets.BENCH_SITE_URL }}"
-            PORT="${{ secrets.BENCH_PORT }}"
-          elif [[ "${{ github.ref_name }}" == "master" ]]; then
-            NAMESPACE="${{ secrets.PROD_NAMESPACE }}"
-            SITE_URL="${{ secrets.PROD_SITE_URL }}"
-            PORT="${{ secrets.PROD_PORT }}"
-          else
-            echo "Branch não reconhecida. Abortando."
-            exit 1
-          fi
-          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
+          echo "Promovendo deployment com ID: $DEPLOYMENT_ID2"
+          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
           echo "Deployment promovido com sucesso!"
-
-
