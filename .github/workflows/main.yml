@@ -107,7 +107,7 @@ jobs:
     needs: [setup-nomad-pack]
     env:
       NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
-      echo "printenv"
+
     steps:
       - name: Instalar Nomad CLI
         run: |
@@ -117,6 +117,7 @@ jobs:
 
       - name: Promover Deployment
         run: |
+          echo "printenv"
           echo "Iniciando promoção do deployment..."
 
           echo "Deployment ID: ${{ env.DEPLOYMENT_ID }}"
