@@ -98,6 +98,7 @@ jobs:
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
           echo "Registrando o Deployment id em $GITHUB_WORKSPACE/deployment_id.txt"
           echo "$DEPLOYMENT_ID" > $GITHUB_WORKSPACE/deployment_id.txt
+          echo "$DEPLOYMENT_ID" > deployment_id.txt
           OUTPUT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
           echo "Arquivo final $OUTPUT_ID"
           echo "Fim"
@@ -106,7 +107,21 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: deployment-id
-          path: $GITHUB_WORKSPACE/deployment_id.txt
+          path: deployment_id.txt
+
+      - name: Upload Deployment ID as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-id
+          path: deployment_id.txt
+
+      - name: Download Deployment ID artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-id
+
+      - name: Show Deployment ID
+        run: cat deployment_id.txt
 
 
   approve:
