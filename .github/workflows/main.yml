@@ -102,7 +102,6 @@ jobs:
           echo "Arquivo final $OUTPUT_ID"
           echo "Fim"
 
-          nomad deployment promote -namespace=$NAMESPACE $OUTPUT_ID
   
 
   approve:
@@ -128,7 +127,7 @@ jobs:
           echo "Deployment ID: $DEPLOYMENT_ID"
           
           if [[ -z "$DEPLOYMENT_ID" ]]; then
-            echo "Erro: DEPLOYMENT_ID não foi passado do job anterior."
+            echo "Erro: arquivo $DEPLOYMENT_ID não encontrado"
             exit 1
           fi
 
