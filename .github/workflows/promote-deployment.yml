@@ -3,7 +3,7 @@ name: Promover Deployment com Nomad
 on:
   workflow_run:
     workflows:
-      - "Deploy com Nomad"
+      - "nomad-pack"
     types:
       - completed
 
