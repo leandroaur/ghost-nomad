@@ -96,10 +96,10 @@ jobs:
           fi
   
           echo "Deployment ID capturado: $DEPLOYMENT_ID"
-          echo "$DEPLOYMENT_ID" > $GITHUB_ENV
+          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
           
           echo "Aguardando o registro do deployment..."
-          sleep 30
+          sleep 10
 
   approve:
     runs-on: ubuntu-latest
@@ -107,6 +107,7 @@ jobs:
     needs: [setup-nomad-pack]
     env:
       NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
+      echo "printenv"
     steps:
       - name: Instalar Nomad CLI
         run: |
@@ -118,10 +119,9 @@ jobs:
         run: |
           echo "Iniciando promoção do deployment..."
 
-          DEPLOYMENT_ID=$(cat $GITHUB_ENV)
-          echo "DEPLOYMENT_ID: $DEPLOYMENT_ID"
+          echo "Deployment ID: ${{ env.DEPLOYMENT_ID }}"
           
-          if [[ -z "$DEPLOYMENT_ID" ]]; then
+          if [[ -z "${{ env.DEPLOYMENT_ID }}" ]]; then
             echo "Erro: DEPLOYMENT_ID não foi passado do job anterior."
             exit 1
           fi
