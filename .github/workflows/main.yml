@@ -161,5 +161,12 @@ jobs:
             exit 1
           fi
 
+      - name: Await Manual Approval
+        uses: fjogeleit/manual-approval-action@v2
+        with:
+          message: "Aprovar para promover o deployment?"
+
+      - name: Approve deployment
+        run: |
           nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
 
