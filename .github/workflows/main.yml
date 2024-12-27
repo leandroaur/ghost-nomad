@@ -137,6 +137,9 @@ jobs:
           curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
           unzip nomad.zip
           sudo mv nomad /usr/local/bin/
+      
+      - name: Run a one-line script
+        run: echo "Hello, ${{ github.event.inputs.environment }}!"
 
       - name: Download deployment_id artifact
         uses: actions/download-artifact@v3
