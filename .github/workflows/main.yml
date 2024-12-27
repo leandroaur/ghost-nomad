@@ -138,6 +138,9 @@ jobs:
           unzip nomad.zip
           sudo mv nomad /usr/local/bin/
 
+      - name: Run a one-line script
+        run: echo "Hello, ${{ github.event.inputs.environment }}!"
+
       - name: Download deployment_id artifact
         uses: actions/download-artifact@v3
         with:
