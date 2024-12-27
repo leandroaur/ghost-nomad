@@ -132,8 +132,8 @@ job "ghost-__NAMESPACE__" {
       driver = "docker"
 
       config {
-        image = "mysql:8.0"
-        ports = ["db-__NAMESPACE__"]
+        image   = "mysql:8.0"
+        ports   = ["db-__NAMESPACE__"]
         volumes = [
           "local/mysql-data:/var/lib/mysql"
         ]
