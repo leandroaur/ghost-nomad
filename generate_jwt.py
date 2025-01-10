@@ -16,7 +16,7 @@ key_id, secret = key.split(":")
 # Cria o payload
 iat = int(time.time())  # Tempo de emissão
 exp = iat + 300         # Token válido por 5 minutos (300 segundos)
-aud = "/admin/"         # Público para a API do Ghost Admin
+aud = "/v3/admin/"      # Público para a API do Ghost Admin
 
 payload = {
     "iat": iat,
