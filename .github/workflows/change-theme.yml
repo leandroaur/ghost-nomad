@@ -1,0 +1,51 @@
+name: Change Theme
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install pyjwt
+
+    - name: Generate JWT token for Ghost API
+      env:
+        GHOST_ADMIN_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
+      run: |
+        TOKEN=$(python3 generate_jwt.py "$GHOST_ADMIN_API_KEY")
+        echo "JWT_TOKEN=$TOKEN" >> $GITHUB_ENV
+
+    - name: Publish Theme to Ghost
+      env:
+        SITE_URL: ${{ secrets.SITE_URL }}
+        JWT_TOKEN: ${{ env.JWT_TOKEN }}
+      run: |
+        for theme in themes/*.zip; do
+          if [ -f "$theme" ]; then
+            echo "Uploading theme: $theme"
+            response=$(curl -s -X POST "$SITE_URL/ghost/api/v3/admin/themes/upload/" \
+              -H "Authorization: Ghost $JWT_TOKEN" \
+              -F "file=@$theme;type=application/zip")
+            
+            echo "Response: $response"
+            if echo "$response" | grep -q "\"errors\""; then
+              echo "Failed to upload $theme. See response above."
+              exit 1
+            else
+              echo "Theme $theme uploaded successfully."
+              break
+            fi
+          fi
+        done
