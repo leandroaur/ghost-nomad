@@ -152,7 +152,6 @@ jobs:
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo tailscale up --authkey=${{ secrets.TAILSCALE_KEY }}  
 
-    steps:
       - name: Instalar Nomad CLI
         run: |
           curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
