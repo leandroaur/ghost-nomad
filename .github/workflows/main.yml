@@ -12,7 +12,7 @@ jobs:
     name: Run Nomad Pack
     env:
       # NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
-      NOMAD_ADDR=http://192.168.1.86:4646
+      NOMAD_ADDR: http://192.168.1.86:4646
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -144,7 +144,7 @@ jobs:
     needs: [setup-nomad-pack]
     env:
       # NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
-      NOMAD_ADDR=http://192.168.1.86:4646
+      NOMAD_ADDR: http://192.168.1.86:4646
 
     steps:
       - name: Install Tailscale
