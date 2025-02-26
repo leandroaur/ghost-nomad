@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Nomad Pack
     env:
-      # NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
       NOMAD_ADDR: http://192.168.1.86:4646
     steps:
       - name: Checkout
@@ -21,7 +20,6 @@ jobs:
         run: |
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo tailscale up --authkey=${{ secrets.TAILSCALE_KEY }}
-
 
       - name: Install Nomad CLI
         run: |
@@ -81,7 +79,6 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
-          # INDEX=$(nomad job plan ghost.nomad | awk '/Job Modify Index/ {print $4}')
           INDEX=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job plan ghost.nomad | awk '/Job Modify Index/ {print \$4}'")
           if [[ -z "$INDEX" ]]; then
             echo "Erro: Não foi possível capturar o Job Modify Index."
@@ -95,13 +92,10 @@ jobs:
           echo "Iniciando o deploy..."
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key            
-          # Executa o deploy e captura a saída
-          # OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado")
           OUTPUT=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo 'Erro transitório ignorado'")
           echo "Saída do comando: $OUTPUT"
           rm private_key
 
-          # Captura o Deployment ID, verificando tanto sucesso quanto falhas transitórias
           DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Monitoring deployment ")[^"]+')
             
           if [[ -z "$DEPLOYMENT_ID" ]]; then
@@ -118,32 +112,19 @@ jobs:
           echo "Fim"
 
       - name: Upload deployment_id artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: deployment-id
           path: deployment_id.txt
 
-      # - name: Upload Deployment ID as artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: deployment-id
-      #     path: deployment_id.txt
-
-      # - name: Download Deployment ID artifact
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: deployment-id
-
       - name: Show Deployment ID
         run: cat deployment_id.txt
-
 
   approve:
     runs-on: ubuntu-latest
     name: Promover deployment
     needs: [setup-nomad-pack]
     env:
-      # NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
       NOMAD_ADDR: http://192.168.1.86:4646
 
     steps:
@@ -162,7 +143,7 @@ jobs:
         run: echo "Hello, ${{ github.event.inputs.environment }}!"
 
       - name: Download deployment_id artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: deployment-id
 
@@ -183,8 +164,7 @@ jobs:
             echo "Branch não reconhecida. Abortando."
             exit 1
           fi
-          # nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
-          rm private_key          
+          rm private_key
