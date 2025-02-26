@@ -11,10 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Nomad Pack
     env:
-      NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
+      # NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
+      NOMAD_ADDR=http://192.168.1.86:4646
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Install Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscale up --authkey=${{ secrets.TAILSCALE_KEY }}
+
 
       - name: Install Nomad CLI
         run: |
@@ -72,20 +79,27 @@ jobs:
       - name: Plan job and capture Job Modify Index
         id: plan
         run: |
-          INDEX=$(nomad job plan ghost.nomad | awk '/Job Modify Index/ {print $4}')
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          # INDEX=$(nomad job plan ghost.nomad | awk '/Job Modify Index/ {print $4}')
+          INDEX=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job plan ghost.nomad | awk '/Job Modify Index/ {print \$4}'")
           if [[ -z "$INDEX" ]]; then
             echo "Erro: Não foi possível capturar o Job Modify Index."
             exit 1
           fi
           echo "INDEX=$INDEX" >> $GITHUB_ENV
+          rm private_key
 
       - name: Deploy job and capture Deployment ID
         run: |
           echo "Iniciando o deploy..."
-            
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key            
           # Executa o deploy e captura a saída
-          OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado")
+          # OUTPUT=$(nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo "Erro transitório ignorado")
+          OUTPUT=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo 'Erro transitório ignorado'")
           echo "Saída do comando: $OUTPUT"
+          rm private_key
 
           # Captura o Deployment ID, verificando tanto sucesso quanto falhas transitórias
           DEPLOYMENT_ID=$(echo "$OUTPUT" | grep -oP '(?<=Monitoring deployment ")[^"]+')
@@ -109,16 +123,16 @@ jobs:
           name: deployment-id
           path: deployment_id.txt
 
-      - name: Upload Deployment ID as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: deployment-id
-          path: deployment_id.txt
+      # - name: Upload Deployment ID as artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: deployment-id
+      #     path: deployment_id.txt
 
-      - name: Download Deployment ID artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: deployment-id
+      # - name: Download Deployment ID artifact
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: deployment-id
 
       - name: Show Deployment ID
         run: cat deployment_id.txt
@@ -129,7 +143,14 @@ jobs:
     name: Promover deployment
     needs: [setup-nomad-pack]
     env:
-      NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
+      # NOMAD_ADDR: "https://${{ secrets.NOMAD_SERVER }}"
+      NOMAD_ADDR=http://192.168.1.86:4646
+
+    steps:
+      - name: Install Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscale up --authkey=${{ secrets.TAILSCALE_KEY }}  
 
     steps:
       - name: Instalar Nomad CLI
@@ -163,4 +184,8 @@ jobs:
             echo "Branch não reconhecida. Abortando."
             exit 1
           fi
-          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
+          # nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
+          rm private_key          

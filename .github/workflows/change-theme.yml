@@ -20,9 +20,18 @@ jobs:
         python3 -m pip install --upgrade pip
         pip install pyjwt
 
+    - name: Set Ghost Admin API Key
+      id: set-api-key
+      run: |
+        if [ "${{ github.ref }}" == "refs/heads/bench" ]; then
+          echo "GHOST_ADMIN_API_KEY=${{ secrets.GHOST_BENCH_ADMIN_API_KEY }}" >> $GITHUB_ENV
+        else
+          echo "GHOST_ADMIN_API_KEY=${{ secrets.GHOST_ADMIN_API_KEY }}" >> $GITHUB_ENV
+        fi
+
     - name: Generate JWT token for Ghost API
       env:
-        GHOST_ADMIN_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
+        GHOST_ADMIN_API_KEY: ${{ env.GHOST_ADMIN_API_KEY }}
       run: |
         TOKEN=$(python3 generate_jwt.py "$GHOST_ADMIN_API_KEY")
         echo "JWT_TOKEN=$TOKEN" >> $GITHUB_ENV
