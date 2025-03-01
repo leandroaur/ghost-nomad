@@ -179,7 +179,18 @@ jobs:
             echo "Branch não reconhecida. Abortando."
             exit 1
           fi
+
+          DEPLOYMENT_STATUS=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment status $DEPLOYMENT_ID2 | grep 'Status'")
+          echo "Deployment status: $DEPLOYMENT_STATUS"
+
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
+
+          if [[ "$DEPLOYMENT_STATUS" == *"successful"* || "$DEPLOYMENT_STATUS" == *"failed"* ]]; then
+            echo "Deployment já está finalizado. Nenhuma ação necessária."
+          else
+            ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
+          fi
+
+          # ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
           rm private_key
