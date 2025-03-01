@@ -60,7 +60,7 @@ job "ghost-__NAMESPACE__" {
     "transport": "SMTP",
     "options": {
       "service": "service_provider",
-      "host": "smtp.account.com",
+      "host": "smtp.account_provider.com",
       "port": 465,
       "secure": true,
       "auth": {

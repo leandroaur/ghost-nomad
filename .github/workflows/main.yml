@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'ghost.nomad'
-      - 'images/**'
+      # - 'images/**'
 
 jobs:
   setup-nomad-pack:
@@ -135,6 +135,27 @@ jobs:
       - name: Show Deployment ID
         run: cat deployment_id.txt
 
+  approve:
+    runs-on: ubuntu-latest
+    name: Promover deployment
+    needs: [setup-nomad-pack]
+    env:
+      NOMAD_ADDR: http://192.168.1.86:4646
+
+    steps:
+      - name: Install Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscale up --authkey=${{ secrets.TAILSCALE_KEY }}  
+
+      - name: Instalar Nomad CLI
+        run: |
+          curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
+          unzip nomad.zip
+          sudo mv nomad /usr/local/bin/
+
+      - name: Run a one-line script
+        run: echo "Hello, ${{ github.event.inputs.environment }}!"
 
       - name: Download deployment_id artifact
         uses: actions/download-artifact@v4
@@ -173,63 +194,3 @@ jobs:
 
           # ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
           rm private_key
-
-  # approve:
-  #   runs-on: ubuntu-latest
-  #   name: Promover deployment
-  #   needs: [setup-nomad-pack]
-  #   env:
-  #     NOMAD_ADDR: http://192.168.1.86:4646
-
-  #   steps:
-  #     - name: Install Tailscale
-  #       run: |
-  #         curl -fsSL https://tailscale.com/install.sh | sh
-  #         sudo tailscale up --authkey=${{ secrets.TAILSCALE_KEY }}  
-
-  #     - name: Instalar Nomad CLI
-  #       run: |
-  #         curl -fsSL https://releases.hashicorp.com/nomad/1.9.4/nomad_1.9.4_linux_amd64.zip -o nomad.zip
-  #         unzip nomad.zip
-  #         sudo mv nomad /usr/local/bin/
-
-  #     - name: Run a one-line script
-  #       run: echo "Hello, ${{ github.event.inputs.environment }}!"
-
-  #     - name: Download deployment_id artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: deployment-id
-
-  #     - name: Read Deployment ID from artifact and Promote
-  #       run: |
-  #         DEPLOYMENT_ID2=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
-  #         echo "Deployment ID: $DEPLOYMENT_ID2"
-
-  #         if [[ "${{ github.ref_name }}" == "bench" ]]; then
-  #           NAMESPACE="${{ secrets.BENCH_NAMESPACE }}"
-  #           SITE_URL="${{ secrets.BENCH_SITE_URL }}"
-  #           PORT="${{ secrets.BENCH_PORT }}"
-  #         elif [[ "${{ github.ref_name }}" == "master" ]]; then
-  #           NAMESPACE="${{ secrets.PROD_NAMESPACE }}"
-  #           SITE_URL="${{ secrets.PROD_SITE_URL }}"
-  #           PORT="${{ secrets.PROD_PORT }}"
-  #         else
-  #           echo "Branch não reconhecida. Abortando."
-  #           exit 1
-  #         fi
-
-  #         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-  #         chmod 600 private_key
-
-  #         DEPLOYMENT_STATUS=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment status $DEPLOYMENT_ID2 | grep 'Status'")
-  #         echo "Deployment status: $DEPLOYMENT_STATUS"
-
-  #         if [[ "$DEPLOYMENT_STATUS" == *"successful"* || "$DEPLOYMENT_STATUS" == *"failed"* ]]; then
-  #           echo "Deployment já está finalizado. Nenhuma ação necessária."
-  #         else
-  #           ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
-  #         fi
-
-  #         # ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID2"
-  #         rm private_key
