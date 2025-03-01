@@ -77,6 +77,7 @@ jobs:
       - name: Test jump server connection
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          cat private_key
           chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "echo 'Conexão com o jump server estabelecida.'"
           rm private_key
