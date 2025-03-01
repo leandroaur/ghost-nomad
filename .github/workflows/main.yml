@@ -82,12 +82,19 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "echo 'Conexão com o jump server estabelecida.'"
           rm private_key
 
+      - name: Send ghost.nomad to Jump Server
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          scp -o StrictHostKeyChecking=no -i private_key ghost.nomad ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }}:/tmp/ghost_${{ github.run_number }}.nomad
+          rm private_key
+
       - name: Plan job and capture Job Modify Index
         id: plan
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
-          INDEX=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job plan ghost.nomad | awk '/Job Modify Index/ {print \$4}'")
+          INDEX=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job plan /tmp/ghost_${{ github.run_number }}.nomad | awk '/Job Modify Index/ {print \$4}'")
           if [[ -z "$INDEX" ]]; then
             echo "Erro: Não foi possível capturar o Job Modify Index."
             exit 1
@@ -100,7 +107,7 @@ jobs:
           echo "Iniciando o deploy..."
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key            
-          OUTPUT=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} ghost.nomad || echo 'Erro transitório ignorado'")
+          OUTPUT=$(ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "nomad job run -namespace=$NAMESPACE -check-index ${{ env.INDEX }} /tmp/ghost_${{ github.run_number }}.nomad || echo 'Erro transitório ignorado'")
           echo "Saída do comando: $OUTPUT"
           rm private_key
 
