@@ -74,6 +74,13 @@ jobs:
           sed -i "s|__MYSQL_USER__|${{ secrets.MYSQL_USER }}|g" ghost.nomad
           sed -i "s|__MYSQL_PASSWORD__|${{ secrets.MYSQL_PASSWORD }}|g" ghost.nomad
 
+      - name: Test jump server connection
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.JUMP_SERVER_USER }}@${{ secrets.JUMP_SERVER_IP }} "echo 'Conexão com o jump server estabelecida.'"
+          rm private_key
+
       - name: Plan job and capture Job Modify Index
         id: plan
         run: |
