@@ -125,6 +125,7 @@ jobs:
           OUTPUT_ID=$(cat $GITHUB_WORKSPACE/deployment_id.txt)
           echo "Arquivo final $OUTPUT_ID"
           echo "Fim"
+        shell: /usr/bin/bash -e {0}
 
       - name: Upload deployment_id artifact
         uses: actions/upload-artifact@v4
