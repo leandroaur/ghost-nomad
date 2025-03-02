@@ -8,7 +8,7 @@ on:
       - completed
 
 env:
-  NOMAD_ADDR: https://nomad.leandroaurelio.com
+  NOMAD_ADDR: http://192.168.1.86:4646
   NAMESPACE: bench
 
 jobs:
@@ -22,15 +22,43 @@ jobs:
           unzip nomad.zip
           sudo mv nomad /usr/local/bin/
 
-      - name: Promover Deployment
+      - name: Obter Deployment ID
         run: |
-          echo "Iniciando a promoção do deployment..."
+          echo "Obtendo o Deployment ID..."
           DEPLOYMENT_ID=$(cat $GITHUB_ENV | grep DEPLOYMENT_ID | cut -d'=' -f2)
-
           if [[ -z "$DEPLOYMENT_ID" ]]; then
             echo "Erro: Deployment ID não encontrado."
             exit 1
           fi
+          echo "Deployment ID: $DEPLOYMENT_ID"
 
-          nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID
-          echo "Deployment promovido com sucesso!"
+      - name: Promover Deployment com Reintento
+        run: |
+          echo "Iniciando a promoção do deployment..."
+          
+          # Loop de reintento para promoção do canário
+          MAX_RETRIES=10
+          RETRY_INTERVAL=10
+
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+            echo "Tentativa $i de $MAX_RETRIES para promover o deployment..."
+            
+            RESPONSE=$(nomad deployment promote -namespace=$NAMESPACE $DEPLOYMENT_ID 2>&1)
+
+            # Verifica se ocorreu erro 500 devido ao canário não estar pronto
+            if echo "$RESPONSE" | grep -q "Task group .* has 0/1 healthy allocations"; then
+              echo "Erro 500 detectado, aguardando $RETRY_INTERVAL segundos antes de tentar novamente..."
+              sleep $RETRY_INTERVAL
+            else
+              echo "Promoção concluída ou outro erro ocorreu. Saída:"
+              echo "$RESPONSE"
+              break
+            fi
+          done
+
+          if [[ $i -gt $MAX_RETRIES ]]; then
+            echo "Erro: Não foi possível promover o deployment após $MAX_RETRIES tentativas."
+            exit 1
+          fi
+
+          echo "Deployment promoted successfully!"
