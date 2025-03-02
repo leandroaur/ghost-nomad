@@ -35,6 +35,8 @@ jobs:
       - name: Promover Deployment com Reintento
         run: |
           echo "Iniciando a promoção do deployment..."
+
+          sleep 20
           
           # Loop de reintento para promoção do canário
           MAX_RETRIES=10
