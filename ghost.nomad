@@ -23,7 +23,7 @@ job "ghost-__NAMESPACE__" {
       delay    = "25s"
       mode     = "delay"
     }
-    # create a randon comment here
+    
     task "ghost-__NAMESPACE__" {
       driver = "docker"
 
